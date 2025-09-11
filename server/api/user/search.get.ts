@@ -3,13 +3,20 @@ import { userRepository } from "../../repositories/user.repository";
 
 export default defineEventHandler(async (event) => {
   try {
-    const query = getQuery(event).q as string;
+    console.log("URL completa:", event.node.req.url);
+    console.log("Method:", event.node.req.method);
+    console.log("Path:", event._path);
+
+    const query = getQuery(event).user as string;
+
+    console.log("Parâmetro de busca:", query);
 
     if (!query || query.length < 2) {
-      throw createError({
-        statusCode: 400,
-        message: "Query deve ter pelo menos 2 caracteres",
-      });
+      return {
+        success: true,
+        users: [],
+        count: 0,
+      };
     }
 
     const users = await userRepository.searchUsers(query);
@@ -19,7 +26,9 @@ export default defineEventHandler(async (event) => {
       users,
       count: users.length,
     };
-  } catch (error) {
+  } catch (error: any) {
+    console.error("Erro na busca:", error);
+
     throw createError({
       statusCode: 500,
       message: "Erro na busca de usuários",

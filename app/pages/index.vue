@@ -1,13 +1,21 @@
 <template>
-  <div>
-    asssssssssss
+  <div class="flex flex-col gap-4">
+    <section class="w-full flex justify-end">
+      <UButton @click="logout">Logout</UButton>
+    </section>
 
-    <UButton @click="logout">Logout</UButton>
+    <Profile />
+
+    <section class="w-full flex gap-4">
+      <SideBar />
+      <Chat />
+    </section>
   </div>
 </template>
 
 <script setup lang="ts">
 import { useUserStore } from "~/store/useUserStore";
+const userStore = useUserStore();
 
 const logout = async () => {
   try {
@@ -17,7 +25,7 @@ const logout = async () => {
 
     if (!response.success) throw response;
 
-    useUserStore().clearUser();
+    userStore.clearUser();
     navigateTo("/login");
   } catch (error: any) {
     console.log(`${error.data.statusCode} - ${error.data.message}`);

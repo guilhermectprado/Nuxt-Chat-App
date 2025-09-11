@@ -1,6 +1,6 @@
 <template>
   <UApp :locale="pt_br">
-    <NuxtPage />
+    <NuxtPage class="p-4" />
   </UApp>
 </template>
 <script setup>
