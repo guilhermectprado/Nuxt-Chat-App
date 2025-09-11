@@ -1,9 +1,21 @@
-// export const logout = (req, res) => {
-//   try {
-//     res.cookie("jwt", "", { maxAge: 0 });
-//     res.status(200).json({ message: "Deslogado com sucesso" });
-//   } catch (error) {
-//     console.log("Erro na Controladora Auth (logout)", error.message);
-//     res.status(500).json({ message: "Erro Interno do Servidor" });
-//   }
-// };
+export default defineEventHandler(async (event) => {
+  try {
+    deleteCookie(event, "jwt");
+
+    setResponseStatus(event, 200);
+
+    return {
+      success: true,
+      message: "Logout realizado com sucesso.",
+    };
+  } catch (error: any) {
+    if (error.statusCode && error.statusCode !== 500) {
+      throw error;
+    }
+
+    throw createError({
+      statusCode: 500,
+      message: "Login - Erro no Servidor",
+    });
+  }
+});

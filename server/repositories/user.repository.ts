@@ -23,8 +23,16 @@ export class UserRepository {
     return user as IUser | null;
   }
 
-  async findByEmail(email: string): Promise<IUser | null> {
-    const user = await User.findOne({ email }).select("-password").lean();
+  async findByEmail(
+    email: string,
+    withPassword: boolean = false
+  ): Promise<IUser | null> {
+    let user;
+    if (withPassword) {
+      user = await User.findOne({ email }).lean();
+    } else {
+      user = await User.findOne({ email }).select("-password").lean();
+    }
     return user as IUser | null;
   }
 

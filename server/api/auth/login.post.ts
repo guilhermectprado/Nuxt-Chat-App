@@ -1,29 +1,66 @@
-// export const login = async (req, res) => {
-//   const { email, password } = req.body;
+import jwt from "jsonwebtoken";
+import bcrypt from "bcryptjs";
+import { userRepository } from "../../repositories/user.repository";
+const config = useRuntimeConfig();
 
-//   try {
-//     const user = await User.findOne({ email });
+export default defineEventHandler(async (event) => {
+  try {
+    const { email, password } = await readBody(event);
 
-//     if (!user) {
-//       return res.status(400).json({ message: "Usuário não encontrado" });
-//     }
+    const user = await userRepository.findByEmail(email, true);
 
-//     const isPasswordCorrect = await bcrypt.compare(password, user.password);
-//     if (!isPasswordCorrect) {
-//       return res.status(400).json({ message: "Senha incorreta" });
-//     }
+    if (!user) {
+      throw createError({
+        statusCode: 404,
+        message: "Usuário não encontrado.",
+      });
+    }
 
-//     generateToken(user._id, res);
+    const isPasswordCorrect = await bcrypt.compare(password, user.password);
+    if (!isPasswordCorrect) {
+      throw createError({
+        statusCode: 400,
+        message: "Senha incorreta.",
+      });
+    }
 
-//     res.status(200).json({
-//       _id: user._id,
-//       email: user.email,
-//       fullName: user.fullName,
-//       profileImage: user.profileImage,
-//       createdAt: user.createdAt,
-//     });
-//   } catch (error) {
-//     console.log("Erro na Controladora Auth (login)", error.message);
-//     res.status(500).json({ message: "Erro Interno do Servidor" });
-//   }
-// };
+    const userId = user._id;
+    const token = jwt.sign({ userId }, config.JWT_SECRET, {
+      expiresIn: "7d",
+    });
+
+    setCookie(event, "jwt", token, {
+      maxAge: 7 * 24 * 60 * 60,
+      httpOnly: true,
+      sameSite: "strict",
+      secure: config.NODE_ENV !== "development",
+      path: "/",
+    });
+
+    setResponseStatus(event, 200);
+
+    return {
+      success: true,
+      user: {
+        email: user.email,
+        fullName: user.fullName,
+        username: user.username,
+        profileImage: user.profileImage,
+        friends: user.friends,
+        friendRequests: user.friendRequests,
+        groups: user.groups,
+        isOnline: user.isOnline,
+        lastSeen: user.lastSeen,
+      },
+    };
+  } catch (error: any) {
+    if (error.statusCode && error.statusCode !== 500) {
+      throw error;
+    }
+
+    throw createError({
+      statusCode: 500,
+      message: "Login - Erro no Servidor",
+    });
+  }
+});

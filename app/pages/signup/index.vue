@@ -50,9 +50,9 @@
               color="neutral"
               variant="link"
               :icon="showPassword ? 'i-lucide-eye-off' : 'i-lucide-eye'"
-              :aria-label="showPassword ? 'Hide password' : 'Show password'"
+              :aria-label="showPassword ? 'Esconder senha' : 'Mostrar senha'"
               :aria-pressed="showPassword"
-              aria-controls="password"
+              aria-controls="senha"
               @click="showPassword = !showPassword"
             />
           </template>
@@ -73,9 +73,6 @@
               color="neutral"
               variant="link"
               :icon="showPassword ? 'i-lucide-eye-off' : 'i-lucide-eye'"
-              :aria-label="showPassword ? 'Hide password' : 'Show password'"
-              :aria-pressed="showPassword"
-              aria-controls="password"
               @click="showPassword = !showPassword"
             />
           </template>

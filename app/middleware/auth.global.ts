@@ -1,11 +1,40 @@
-export default defineNuxtRouteMiddleware((to, from) => {
-  const token = useCookie("access_token");
+// middleware/auth.global.ts
+import { useUserStore } from "~/store/useUserStore";
 
-  if (!token.value && to.path !== "/login" && to.path !== "/signup") {
-    return navigateTo("/login");
+export default defineNuxtRouteMiddleware(async (to, from) => {
+  const userStore = useUserStore();
+  const publicRoutes = ["/login", "/signup"];
+  const isPublicRoute = publicRoutes.includes(to.path);
+
+  if (isPublicRoute && !userStore.isAuthenticated) {
+    return;
   }
 
-  if (token.value && (to.path === "/login" || to.path === "/signup")) {
+  if (userStore.isAuthenticated && isPublicRoute) {
     return navigateTo("/");
+  }
+
+  try {
+    const { data, error } = await useFetch("/api/auth/check");
+
+    if (error.value) {
+      throw error.value;
+    }
+
+    if (data.value?.user) {
+      userStore.setUser(data.value.user);
+
+      if (isPublicRoute) {
+        return navigateTo("/");
+      }
+      return;
+    }
+  } catch (error: any) {
+    console.error("Erro na verificação de autenticação:", error);
+    userStore.clearUser();
+
+    if (!isPublicRoute) {
+      return navigateTo("/login");
+    }
   }
 });

@@ -1,5 +1,7 @@
 <template>
   <div class="w-full h-dvh flex flex-col justify-center items-center space-y-6">
+    <h1>Login</h1>
+
     <UForm
       :validate="validate"
       :state="loginForm"
@@ -7,7 +9,7 @@
       :loadingAuto="loading"
       class="min-w-64 w-80 space-y-4"
     >
-      <UFormField label="E-mail" name="email" required>
+      <UFormField label="E-mail" name="email">
         <UInput
           v-model="loginForm.email"
           icon="material-symbols:mail-outline-rounded"
@@ -16,9 +18,9 @@
         />
       </UFormField>
 
-      <UFormField label="Senha" name="senha" required>
+      <UFormField label="Senha" name="password">
         <UInput
-          v-model="loginForm.senha"
+          v-model="loginForm.password"
           :type="showPassword ? 'text' : 'password'"
           size="lg"
           icon="material-symbols:password-rounded"
@@ -30,9 +32,9 @@
               color="neutral"
               variant="link"
               :icon="showPassword ? 'i-lucide-eye-off' : 'i-lucide-eye'"
-              :aria-label="showPassword ? 'Hide password' : 'Show password'"
+              :aria-label="showPassword ? 'Esconder senha' : 'Mostrar senha'"
               :aria-pressed="showPassword"
-              aria-controls="password"
+              aria-controls="senha"
               @click="showPassword = !showPassword"
             />
           </template>
@@ -57,7 +59,6 @@
         color="error"
         close
         @update:open="errorMessage = ''"
-        :ui="{ close: 'text-white' }"
       />
     </UForm>
   </div>
@@ -65,10 +66,11 @@
 
 <script setup lang="ts">
 import type { FormError, FormSubmitEvent } from "@nuxt/ui";
+import { useUserStore } from "~/store/useUserStore";
 
 const loginForm = reactive({
   email: "",
-  senha: "",
+  password: "",
 });
 
 const showPassword = ref(false);
@@ -81,11 +83,11 @@ const validate = (loginForm: any): FormError[] => {
   if (!loginForm.email)
     errors.push({ name: "email", message: "Insira um e-mail." });
 
-  if (!loginForm.senha)
-    errors.push({ name: "senha", message: "Insira uma senha." });
+  if (!loginForm.password)
+    errors.push({ name: "password", message: "Insira uma senha." });
 
-  if (loginForm.senha.length < 8)
-    errors.push({ name: "senha", message: "Mínimo de 8 caracteres." });
+  if (loginForm.password.length < 8)
+    errors.push({ name: "password", message: "Mínimo de 8 caracteres." });
 
   return errors;
 };
@@ -93,17 +95,19 @@ const validate = (loginForm: any): FormError[] => {
 async function onSubmit(event: FormSubmitEvent<typeof loginForm>) {
   try {
     loading.value = true;
+    errorMessage.value = "";
 
-    const { data, status } = await useFetch("/api/auth/login", {
+    const response = await $fetch("/api/auth/login", {
       method: "POST",
       body: loginForm,
     });
 
-    errorMessage.value = "";
+    if (!response.success) throw response;
+
+    useUserStore().setUser(response.user);
     navigateTo("/");
   } catch (error: any) {
-    console.log(error);
-    errorMessage.value = error;
+    errorMessage.value = `${error.data.statusCode} - ${error.data.message}`;
   } finally {
     loading.value = false;
   }
