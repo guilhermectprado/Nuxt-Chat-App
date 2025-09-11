@@ -40,8 +40,6 @@ export default defineEventHandler(async (event) => {
       user,
     };
   } catch (error: any) {
-    console.log(error);
-
     if (error.statusCode && error.statusCode !== 500) {
       throw error;
     }

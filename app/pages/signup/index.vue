@@ -96,7 +96,6 @@
         color="error"
         close
         @update:open="errorMessage = ''"
-        :ui="{ close: 'text-white' }"
       />
     </UForm>
   </div>
@@ -150,19 +149,18 @@ const validate = (loginForm: any): FormError[] => {
 async function onSubmit(event: FormSubmitEvent<typeof loginForm>) {
   try {
     loading.value = true;
+    errorMessage.value = "";
 
-    const { data, status } = await useFetch("/api/auth/signup", {
+    const { error } = await useFetch("/api/auth/signup", {
       method: "POST",
       body: loginForm,
     });
 
-    console.log(status);
-    console.log(data);
-    errorMessage.value = "";
-    // navigateTo("/");
+    if (error) throw error.value;
+
+    navigateTo("/login");
   } catch (error: any) {
-    console.log(error);
-    errorMessage.value = error;
+    errorMessage.value = `${error.data.statusCode} - ${error.data.message}`;
   } finally {
     loading.value = false;
   }
