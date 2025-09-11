@@ -19,6 +19,7 @@ const userSchema = new mongoose.Schema(
     username: {
       type: String,
       required: true,
+      unique: true,
     },
     profileImage: {
       type: String,
@@ -54,11 +55,6 @@ const userSchema = new mongoose.Schema(
 );
 
 // ===== INDEXES PARA PERFORMANCE =====
-
-// Login - busca rápida por email/username
-userSchema.index({ email: 1 });
-userSchema.index({ username: 1 });
-
 // Status online - buscar usuários online
 userSchema.index({ isOnline: 1 });
 

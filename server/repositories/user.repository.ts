@@ -9,7 +9,6 @@ export class UserRepository {
     const user = new User(userData);
     await user.save();
 
-    // Buscar o usuário salvo sem a senha
     const savedUser = await User.findById(user._id).select("-password").lean();
     return savedUser as IUser;
   }
