@@ -41,22 +41,22 @@ export class UserRepository {
     return user as IUser | null;
   }
 
-  async getUsersByIds(ids: string[]): Promise<IUser[]> {
-    // Filtrar apenas IDs válidos
-    const validIds = ids.filter((id) => Types.ObjectId.isValid(id));
+  // async getUsersByIds(ids: string[]): Promise<IUser[]> {
+  //   // Filtrar apenas IDs válidos
+  //   const validIds = ids.filter((id) => Types.ObjectId.isValid(id));
 
-    if (validIds.length === 0) {
-      return [];
-    }
+  //   if (validIds.length === 0) {
+  //     return [];
+  //   }
 
-    const users = await User.find({
-      _id: { $in: validIds.map((id) => new Types.ObjectId(id)) },
-    })
-      .select("-password")
-      .lean();
+  //   const users = await User.find({
+  //     _id: { $in: validIds.map((id) => new Types.ObjectId(id)) },
+  //   })
+  //     .select("-password")
+  //     .lean();
 
-    return users as IUser[];
-  }
+  //   return users as IUser[];
+  // }
 
   // UPDATE
   async updateUser(
@@ -71,101 +71,6 @@ export class UserRepository {
       new: true,
       runValidators: true,
     })
-      .select("-password")
-      .lean();
-
-    return user as IUser | null;
-  }
-
-  // FRIENDS
-  async addFriend(userId: string, friendId: string): Promise<IUser | null> {
-    if (!Types.ObjectId.isValid(userId) || !Types.ObjectId.isValid(friendId)) {
-      return null;
-    }
-
-    const user = await User.findByIdAndUpdate(
-      userId,
-      { $addToSet: { friends: new Types.ObjectId(friendId) } },
-      { new: true }
-    )
-      .select("-password")
-      .lean();
-
-    return user as IUser | null;
-  }
-
-  async removeFriend(userId: string, friendId: string): Promise<IUser | null> {
-    if (!Types.ObjectId.isValid(userId) || !Types.ObjectId.isValid(friendId)) {
-      return null;
-    }
-
-    const user = await User.findByIdAndUpdate(
-      userId,
-      { $pull: { friends: new Types.ObjectId(friendId) } },
-      { new: true }
-    )
-      .select("-password")
-      .lean();
-
-    return user as IUser | null;
-  }
-
-  // FRIEND REQUESTS
-  async addFriendRequest(
-    userId: string,
-    fromUserId: string
-  ): Promise<IUser | null> {
-    if (
-      !Types.ObjectId.isValid(userId) ||
-      !Types.ObjectId.isValid(fromUserId)
-    ) {
-      return null;
-    }
-
-    const user = await User.findByIdAndUpdate(
-      userId,
-      {
-        $addToSet: {
-          friendRequests: {
-            from: new Types.ObjectId(fromUserId),
-            status: "pending",
-            createdAt: new Date(),
-          },
-        },
-      },
-      { new: true }
-    )
-      .select("-password")
-      .lean();
-
-    return user as IUser | null;
-  }
-
-  async updateFriendRequestStatus(
-    userId: string,
-    fromUserId: string,
-    status: "accepted" | "rejected"
-  ): Promise<IUser | null> {
-    if (
-      !Types.ObjectId.isValid(userId) ||
-      !Types.ObjectId.isValid(fromUserId)
-    ) {
-      return null;
-    }
-
-    const user = await User.findOneAndUpdate(
-      {
-        _id: new Types.ObjectId(userId),
-        "friendRequests.from": new Types.ObjectId(fromUserId),
-      },
-      {
-        $set: {
-          "friendRequests.$.status": status,
-          "friendRequests.$.updatedAt": new Date(),
-        },
-      },
-      { new: true }
-    )
       .select("-password")
       .lean();
 
@@ -195,29 +100,6 @@ export class UserRepository {
       .lean();
 
     return users as IUser[];
-  }
-
-  // GET FRIENDS - Agora retorna os dados completos dos amigos
-  async getFriends(userId: string): Promise<IUser[]> {
-    if (!Types.ObjectId.isValid(userId)) {
-      return [];
-    }
-
-    // Buscar o usuário para pegar os IDs dos amigos
-    const user = await User.findById(userId).select("friends").lean();
-
-    if (!user || !user.friends || user.friends.length === 0) {
-      return [];
-    }
-
-    // Buscar os dados completos dos amigos
-    const friendsData = await User.find({
-      _id: { $in: user.friends },
-    })
-      .select("-password")
-      .lean();
-
-    return friendsData as IUser[];
   }
 
   // UPDATE STATUS

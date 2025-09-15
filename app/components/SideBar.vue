@@ -2,8 +2,15 @@
   <section class="flex-1 space-y-4 p-2">
     <div class="flex justify-between items-center gap-4">
       <h1>Chats</h1>
-      <UButton icon="lucide:plus" label="Adicionar" />
+      <UButton
+        icon="lucide:user-round-plus"
+        label="Adicionar Amigo"
+        size="sm"
+        variant="ghost"
+      />
     </div>
+
+    <UInput v-model="search" icon="lucide:user-search" class="w-full" />
 
     <UTabs color="neutral" variant="link" :content="false" :items="items" />
 
@@ -19,11 +26,6 @@
         </div>
       </li>
     </ul>
-
-    <UInput v-model="search" />
-    {{ search }}
-    {{ data }}
-    {{ status }}
   </section>
 </template>
 
@@ -42,7 +44,7 @@ const items = ref<TabsItem[]>([
   },
 ]);
 
-const search = ref<string>("teste");
+const search = ref<string>("");
 
 const { data, status, pending } = useAsyncData(
   "search-key",
