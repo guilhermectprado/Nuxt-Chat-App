@@ -46,8 +46,6 @@ export default defineEventHandler(async (event) => {
         fullName: user.fullName,
         username: user.username,
         profileImage: user.profileImage,
-        friends: user.friends,
-        friendRequests: user.friendRequests,
         groups: user.groups,
         isOnline: user.isOnline,
         lastSeen: user.lastSeen,

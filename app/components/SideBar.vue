@@ -29,7 +29,7 @@
     </ul>
 
     <ul v-else-if="data" class="flex flex-col gap-4">
-      <p v-if="data.count === 0">Nenhum usuário encontrado.</p>
+      <p v-if="data.count === 0">Nenhum amigo encontrado.</p>
 
       <li v-else v-for="(friend, index) in data.friends" :key="index">
         <div class="flex items-center gap-2">
@@ -48,6 +48,10 @@
         </div>
       </li>
     </ul>
+
+    <div v-if="error">
+      <p>{{ (error as any).data.message }}</p>
+    </div>
   </section>
 </template>
 
@@ -67,9 +71,10 @@ const items = ref<TabsItem[]>([
   },
 ]);
 
-const { data, status } = useAsyncData("list-friends", async () => {
-  return await $fetch("/api/friendship/list");
-});
+const { data, status, error } = useAsyncData(
+  "list-friends",
+  async () => await $fetch("/api/friendship/list")
+);
 
 const search = ref<string>("");
 
