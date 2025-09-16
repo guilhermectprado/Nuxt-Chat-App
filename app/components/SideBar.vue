@@ -10,7 +10,7 @@
       />
     </div>
 
-    <UInput v-model="search" icon="lucide:user-search" class="w-full" />
+    <UInput v-model="searchInput" icon="lucide:user-search" class="w-full" />
 
     <UTabs color="neutral" variant="link" :content="false" :items="items" />
 
@@ -44,14 +44,14 @@ const items = ref<TabsItem[]>([
   },
 ]);
 
+const searchInput = ref<string>("");
 const search = ref<string>("");
 
 const { data, status, pending } = useAsyncData(
-  "search-key",
+  `search-${search}`,
   async () => {
     return await $fetch("/api/user/search", {
       query: {
-        // ✅ CORRETO - usa "query" não "params"
         user: search.value,
       },
     });
@@ -61,6 +61,14 @@ const { data, status, pending } = useAsyncData(
     immediate: true,
   }
 );
+
+const debouncedSearch = useDebounceFn((value: string) => {
+  search.value = value;
+}, 500);
+
+watch(searchInput, (newValue) => {
+  debouncedSearch(newValue);
+});
 </script>
 
 <style scoped></style>

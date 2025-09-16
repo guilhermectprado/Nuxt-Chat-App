@@ -4,7 +4,6 @@ import { IUser } from "../types/user.type";
 import { Types } from "mongoose";
 
 export class UserRepository {
-  // CREATE
   async createUser(userData: Partial<IUser>): Promise<IUser> {
     const user = new User(userData);
     await user.save();
@@ -13,7 +12,6 @@ export class UserRepository {
     return savedUser as IUser;
   }
 
-  // READ
   async findById(id: string): Promise<IUser | null> {
     if (!Types.ObjectId.isValid(id)) {
       return null;
@@ -43,24 +41,6 @@ export class UserRepository {
     return user as IUser | null;
   }
 
-  // async getUsersByIds(ids: string[]): Promise<IUser[]> {
-  //   // Filtrar apenas IDs válidos
-  //   const validIds = ids.filter((id) => Types.ObjectId.isValid(id));
-
-  //   if (validIds.length === 0) {
-  //     return [];
-  //   }
-
-  //   const users = await User.find({
-  //     _id: { $in: validIds.map((id) => new Types.ObjectId(id)) },
-  //   })
-  //     .select("-password")
-  //     .lean();
-
-  //   return users as IUser[];
-  // }
-
-  // UPDATE
   async updateUser(
     id: string,
     updateData: Partial<IUser>
@@ -79,7 +59,6 @@ export class UserRepository {
     return user as IUser | null;
   }
 
-  // SEARCH
   async searchUsers(query: string): Promise<IUser[]> {
     const users = await User.find({
       $or: [
@@ -94,7 +73,6 @@ export class UserRepository {
     return users as IUser[];
   }
 
-  // ONLINE USERS
   async getOnlineUsers(): Promise<IUser[]> {
     const users = await User.find({ isOnline: true })
       .select("-password")

@@ -12,6 +12,7 @@ export default defineNuxtConfig({
     "@nuxt/scripts",
     "@nuxt/ui",
     "@pinia/nuxt",
+    "@vueuse/nuxt",
   ],
   runtimeConfig: {
     CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY,
