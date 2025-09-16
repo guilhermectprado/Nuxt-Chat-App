@@ -51,16 +51,28 @@
                   icon="lucide:plus"
                   size="sm"
                   variant="subtle"
+                  label="Adicionar"
                   @click="sendInviteToFriend(searchedUser._id)"
                   :loading="loadingInvite[searchedUser._id]"
                 />
                 <p v-if="searchedUser.relation === 'friends'">Amigo</p>
-                <p v-if="searchedUser.relation === 'pending_sent'">
+                <p
+                  v-if="searchedUser.relation === 'pending_sent'"
+                  class="text-muted text-sm"
+                >
                   Solicitação pendente.
                 </p>
-                <div v-if="searchedUser.relation === 'pending_received'">
+                <div
+                  v-if="searchedUser.relation === 'pending_received'"
+                  class="space-x-2"
+                >
                   <UButton icon="lucide:check" size="sm" variant="subtle" />
-                  <UButton icon="lucide:x" size="sm" variant="subtle" />
+                  <UButton
+                    icon="lucide:x"
+                    size="sm"
+                    variant="subtle"
+                    color="error"
+                  />
                 </div>
               </div>
             </div>
