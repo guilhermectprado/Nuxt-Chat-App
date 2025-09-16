@@ -60,7 +60,7 @@
                 </p>
                 <div v-if="searchedUser.relation === 'pending_received'">
                   <UButton icon="lucide:check" size="sm" variant="subtle" />
-                  <UButton icon="lucide:trash" size="sm" variant="subtle" />
+                  <UButton icon="lucide:x" size="sm" variant="subtle" />
                 </div>
               </div>
             </div>
@@ -112,7 +112,7 @@ const sendInviteToFriend = async (userId: string) => {
     }
 
     const userInvited = data.value?.users.find((user) => user._id === userId);
-    if (userInvited) userInvited.relation = "pending";
+    if (userInvited) userInvited.relation = "pending_sent";
   } catch (error: any) {
     let errorMessage = `${error.data.statusCode} - ${error.data.message}`;
     console.log(errorMessage);
