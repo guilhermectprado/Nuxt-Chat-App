@@ -33,13 +33,20 @@ const userSchema = new mongoose.Schema(
     ],
     friendRequests: [
       {
-        from: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+        from: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User",
+          required: true,
+        },
         status: {
           type: String,
           enum: ["pending", "accepted", "rejected"],
           default: "pending",
         },
         createdAt: { type: Date, default: Date.now },
+        updatedAt: {
+          type: Date,
+        },
       },
     ],
     groups: [

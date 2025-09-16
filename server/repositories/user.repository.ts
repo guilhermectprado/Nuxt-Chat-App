@@ -28,11 +28,13 @@ export class UserRepository {
     withPassword: boolean = false
   ): Promise<IUser | null> {
     let user;
+
     if (withPassword) {
       user = await User.findOne({ email }).lean();
     } else {
       user = await User.findOne({ email }).select("-password").lean();
     }
+
     return user as IUser | null;
   }
 
@@ -103,27 +105,27 @@ export class UserRepository {
   }
 
   // UPDATE STATUS
-  async updateOnlineStatus(
-    userId: string,
-    isOnline: boolean
-  ): Promise<IUser | null> {
-    if (!Types.ObjectId.isValid(userId)) {
-      return null;
-    }
+  // async updateOnlineStatus(
+  //   userId: string,
+  //   isOnline: boolean
+  // ): Promise<IUser | null> {
+  //   if (!Types.ObjectId.isValid(userId)) {
+  //     return null;
+  //   }
 
-    const user = await User.findByIdAndUpdate(
-      userId,
-      {
-        isOnline,
-        lastSeen: new Date(),
-      },
-      { new: true }
-    )
-      .select("-password")
-      .lean();
+  //   const user = await User.findByIdAndUpdate(
+  //     userId,
+  //     {
+  //       isOnline,
+  //       lastSeen: new Date(),
+  //     },
+  //     { new: true }
+  //   )
+  //     .select("-password")
+  //     .lean();
 
-    return user as IUser | null;
-  }
+  //   return user as IUser | null;
+  // }
 
   // MÉTODO UTILITÁRIO - Converte IUser para IUserResponse (para APIs)
   // userToResponse(user: IUser): IUserResponse {

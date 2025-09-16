@@ -3,51 +3,23 @@ import { IUser } from "../types/user.type";
 import { Types } from "mongoose";
 
 export class FriendRepository {
-  async addFriend(userId: string, friendId: string): Promise<IUser | null> {
-    if (!Types.ObjectId.isValid(userId) || !Types.ObjectId.isValid(friendId)) {
-      return null;
-    }
-
-    const user = await User.findByIdAndUpdate(
-      userId,
-      { $addToSet: { friends: new Types.ObjectId(friendId) } },
-      { new: true }
-    )
-      .select("-password")
-      .lean();
-
-    return user as IUser | null;
-  }
-
-  async removeFriend(userId: string, friendId: string): Promise<IUser | null> {
-    if (!Types.ObjectId.isValid(userId) || !Types.ObjectId.isValid(friendId)) {
-      return null;
-    }
-
-    const user = await User.findByIdAndUpdate(
-      userId,
-      { $pull: { friends: new Types.ObjectId(friendId) } },
-      { new: true }
-    )
-      .select("-password")
-      .lean();
-
-    return user as IUser | null;
-  }
-
   async addFriendRequest(
-    userId: string,
-    fromUserId: string
+    fromUserId: string,
+    toUserId: string
   ): Promise<IUser | null> {
     if (
-      !Types.ObjectId.isValid(userId) ||
-      !Types.ObjectId.isValid(fromUserId)
+      !Types.ObjectId.isValid(fromUserId) ||
+      !Types.ObjectId.isValid(toUserId)
     ) {
       return null;
     }
 
+    if (fromUserId === toUserId) {
+      return null;
+    }
+
     const user = await User.findByIdAndUpdate(
-      userId,
+      toUserId,
       {
         $addToSet: {
           friendRequests: {
@@ -96,20 +68,31 @@ export class FriendRepository {
     return user as IUser | null;
   }
 
-  // GET FRIENDS - Agora retorna os dados completos dos amigos
+  async addFriend(userId: string, friendId: string): Promise<IUser | null> {
+    if (!Types.ObjectId.isValid(userId) || !Types.ObjectId.isValid(friendId)) {
+      return null;
+    }
+
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { $addToSet: { friends: new Types.ObjectId(friendId) } },
+      { new: true }
+    );
+
+    return user as IUser | null;
+  }
+
   async getFriends(userId: string): Promise<IUser[]> {
     if (!Types.ObjectId.isValid(userId)) {
       return [];
     }
 
-    // Buscar o usuário para pegar os IDs dos amigos
     const user = await User.findById(userId).select("friends").lean();
 
     if (!user || !user.friends || user.friends.length === 0) {
       return [];
     }
 
-    // Buscar os dados completos dos amigos
     const friendsData = await User.find({
       _id: { $in: user.friends },
     })
@@ -118,4 +101,22 @@ export class FriendRepository {
 
     return friendsData as IUser[];
   }
+
+  // async removeFriend(userId: string, friendId: string): Promise<IUser | null> {
+  //   if (!Types.ObjectId.isValid(userId) || !Types.ObjectId.isValid(friendId)) {
+  //     return null;
+  //   }
+
+  //   const user = await User.findByIdAndUpdate(
+  //     userId,
+  //     { $pull: { friends: new Types.ObjectId(friendId) } },
+  //     { new: true }
+  //   )
+  //     .select("-password")
+  //     .lean();
+
+  //   return user as IUser | null;
+  // }
 }
+
+export const friendRepository = new FriendRepository();
