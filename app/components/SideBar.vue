@@ -7,14 +7,15 @@
         label="Adicionar Amigo"
         size="sm"
         variant="ghost"
+        @click="openSearchUsers"
       />
     </div>
 
-    <UInput v-model="searchInput" icon="lucide:user-search" class="w-full" />
+    <UInput v-model="search" icon="lucide:user-search" class="w-full" />
 
     <UTabs color="neutral" variant="link" :content="false" :items="items" />
 
-    <ul class="flex flex-col gap-4">
+    <ul v-if="status === 'pending'" class="flex flex-col gap-4">
       <li v-for="index in 5" :key="index">
         <div class="flex items-center gap-4">
           <USkeleton class="h-12 w-12 rounded-full" />
@@ -26,11 +27,33 @@
         </div>
       </li>
     </ul>
+
+    <ul v-else-if="data" class="flex flex-col gap-4">
+      <p v-if="data.count === 0">Nenhum usuário encontrado.</p>
+
+      <li v-else v-for="(friend, index) in data.friends" :key="index">
+        <div class="flex items-center gap-2">
+          <UAvatar
+            :src="friend.profileImage ? friend.profileImage : '/image.png'"
+            size="2xl"
+            :chip="{
+              color: friend.isOnline ? 'primary' : 'neutral',
+            }"
+          />
+
+          <div class="mb-1">
+            <h1 class="font-medium">{{ friend.fullName }}</h1>
+            <p class="text-sm text-muted">{{ friend.username }}</p>
+          </div>
+        </div>
+      </li>
+    </ul>
   </section>
 </template>
 
 <script setup lang="ts">
 import type { TabsItem } from "@nuxt/ui";
+import { SearchUser } from "#components";
 
 const items = ref<TabsItem[]>([
   {
@@ -44,31 +67,19 @@ const items = ref<TabsItem[]>([
   },
 ]);
 
-const searchInput = ref<string>("");
+const { data, status } = useAsyncData("list-friends", async () => {
+  return await $fetch("/api/friendship/list");
+});
+
 const search = ref<string>("");
 
-const { data, status, pending } = useAsyncData(
-  `search-${search}`,
-  async () => {
-    return await $fetch("/api/user/search", {
-      query: {
-        user: search.value,
-      },
-    });
-  },
-  {
-    watch: [search],
-    immediate: true,
-  }
-);
+const openSearchUsers = async () => {
+  const overlay = useOverlay();
 
-const debouncedSearch = useDebounceFn((value: string) => {
-  search.value = value;
-}, 500);
+  const modal = overlay.create(SearchUser);
 
-watch(searchInput, (newValue) => {
-  debouncedSearch(newValue);
-});
+  modal.open();
+};
 </script>
 
 <style scoped></style>

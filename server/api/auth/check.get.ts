@@ -1,22 +1,11 @@
-import jwt from "jsonwebtoken";
 import { userRepository } from "../../repositories/user.repository";
-
-const config = useRuntimeConfig();
+import { getIdUser } from "~~/server/utils/getIdUser";
 
 export default defineEventHandler(async (event) => {
   try {
-    const token = getCookie(event, "jwt");
+    const userId = getIdUser(event);
 
-    if (!token) {
-      throw createError({
-        statusCode: 401,
-        message: "Token não encontrado",
-      });
-    }
-
-    const decoded = jwt.verify(token, config.JWT_SECRET) as { userId: string };
-
-    const user = await userRepository.findById(decoded.userId);
+    const user = await userRepository.findById(userId);
 
     if (!user) {
       throw createError({

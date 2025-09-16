@@ -25,30 +25,6 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
-    friends: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-      },
-    ],
-    friendRequests: [
-      {
-        from: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "User",
-          required: true,
-        },
-        status: {
-          type: String,
-          enum: ["pending", "accepted", "rejected"],
-          default: "pending",
-        },
-        createdAt: { type: Date, default: Date.now },
-        updatedAt: {
-          type: Date,
-        },
-      },
-    ],
     groups: [
       {
         type: mongoose.Schema.Types.ObjectId,
@@ -67,12 +43,6 @@ userSchema.index({ isOnline: 1 });
 
 // Busca de usuários - por nome/username
 userSchema.index({ fullName: "text", username: "text" });
-
-// Amigos - buscar amigos de um usuário
-userSchema.index({ friends: 1 });
-
-// Pedidos de amizade - buscar pedidos pendentes
-userSchema.index({ "friendRequests.from": 1, "friendRequests.status": 1 });
 
 // Composto para buscar usuários online ordenados
 userSchema.index({ isOnline: 1, lastSeen: -1 });

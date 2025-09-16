@@ -1,15 +1,11 @@
 // server/api/users/search.get.ts
+import { getIdUser } from "~~/server/utils/getIdUser";
 import { userRepository } from "../../repositories/user.repository";
+import { friendshipRepository } from "~~/server/repositories/friendship.repository";
 
 export default defineEventHandler(async (event) => {
   try {
-    console.log("URL completa:", event.node.req.url);
-    console.log("Method:", event.node.req.method);
-    console.log("Path:", event._path);
-
     const query = getQuery(event).user as string;
-
-    console.log("Parâmetro de busca:", query);
 
     if (!query || query.length < 2) {
       return {
@@ -19,15 +15,59 @@ export default defineEventHandler(async (event) => {
       };
     }
 
-    const users = await userRepository.searchUsers(query);
+    const userId = getIdUser(event);
+
+    const searchedUsers = await userRepository.searchUsers(userId, query);
+    if (searchedUsers.length === 0) {
+      return {
+        success: true,
+        users: [],
+        count: 0,
+      };
+    }
+
+    const friendships = await friendshipRepository.findUserFriendships(userId);
+
+    const usersWithRelation = searchedUsers.map((user) => {
+      const userIdStr = user._id.toString();
+
+      const friendship = friendships.find(
+        (f) =>
+          f.userOne.toString() === userIdStr ||
+          f.userTwo.toString() === userIdStr
+      );
+
+      let relation = "none";
+
+      if (friendship) {
+        if (friendship.status === "accepted") {
+          relation = "friends";
+        } else if (friendship.status === "pending") {
+          relation =
+            friendship.initiator.toString() === userId
+              ? "pending_sent"
+              : "pending_received";
+        }
+      }
+
+      return {
+        _id: userIdStr,
+        fullName: user.fullName,
+        username: user.username,
+        profileImage: user.profileImage || "",
+        relation,
+      };
+    });
 
     return {
       success: true,
-      users,
-      count: users.length,
+      users: usersWithRelation,
+      count: usersWithRelation.length,
     };
   } catch (error: any) {
-    console.error("Erro na busca:", error);
+    if (error.statusCode && error.statusCode !== 500) {
+      throw error;
+    }
 
     throw createError({
       statusCode: 500,
