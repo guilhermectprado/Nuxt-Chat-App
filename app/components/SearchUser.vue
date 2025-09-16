@@ -8,7 +8,7 @@
           class="w-full"
         />
 
-        <ul v-if="status === 'pending'" class="flex flex-col gap-4">
+        <ul v-if="loading" class="flex flex-col gap-4">
           <li v-for="index in 5" :key="index">
             <div class="flex items-center gap-4">
               <USkeleton class="h-12 w-12 rounded-full" />
@@ -89,21 +89,39 @@
 
 <script setup lang="ts">
 const searchInput = ref<string>("");
-const search = ref<string>("");
 
-const { data, status, error } = await useFetch("/api/user/search", {
-  query: computed(() => ({ user: search.value })),
-  watch: [search],
-});
+const loading = ref<boolean>(false);
+const data = ref<any>(undefined);
+const error = ref<any>(undefined);
 
-const debouncedSearch = useDebounceFn((value: string) => {
-  search.value = value;
+const searchUsers = async () => {
+  try {
+    loading.value = true;
+    error.value = null;
+
+    const response = await $fetch("/api/user/search", {
+      query: { user: searchInput.value },
+    });
+
+    data.value = response || [];
+  } catch (error: any) {
+    data.value = [];
+    error.value = `${error.data.statusCode} - ${error.data.message}`;
+  } finally {
+    loading.value = false;
+  }
+};
+
+const debouncedSearch = useDebounceFn(() => {
+  searchUsers();
 }, 500);
 
 watch(searchInput, (newValue) => {
-  if (!searchInput) return;
-
-  debouncedSearch(newValue);
+  if (!newValue || newValue.length < 2) {
+    data.value = [];
+    return;
+  }
+  debouncedSearch();
 });
 
 const loadingInvite = ref<Record<string, boolean>>({});
@@ -112,19 +130,20 @@ const sendInviteToFriend = async (userId: string) => {
   try {
     loadingInvite.value[userId] = true;
 
-    const { error } = useFetch("/api/friendship/invite", {
+    const response = await $fetch("/api/friendship/invite", {
       method: "POST",
       body: {
         toUserId: userId,
       },
     });
 
-    if (error.value) {
-      throw error.value;
-    }
+    if (!response.success) throw response;
 
-    const userInvited = data.value?.users.find((user) => user._id === userId);
-    if (userInvited) userInvited.relation = "pending_sent";
+    const userInvited = data.value.users.find(
+      (user: any) => user._id === userId
+    );
+
+    userInvited.relation = "pending_sent";
   } catch (error: any) {
     let errorMessage = `${error.data.statusCode} - ${error.data.message}`;
     console.log(errorMessage);

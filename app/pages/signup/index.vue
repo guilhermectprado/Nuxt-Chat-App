@@ -148,14 +148,16 @@ async function onSubmit(event: FormSubmitEvent<typeof loginForm>) {
     loading.value = true;
     errorMessage.value = "";
 
-    const { error } = await useFetch("/api/auth/signup", {
+    const response = await $fetch("/api/auth/signup", {
       method: "POST",
       body: loginForm,
     });
 
-    if (error) throw error.value;
-
-    navigateTo("/login");
+    if (!response.success) {
+      throw response;
+    } else {
+      navigateTo("/login");
+    }
   } catch (error: any) {
     errorMessage.value = `${error.data.statusCode} - ${error.data.message}`;
   } finally {
