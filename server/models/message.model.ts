@@ -2,12 +2,12 @@ import mongoose from "mongoose";
 
 const messageSchema = new mongoose.Schema(
   {
-    chatId: {
+    chat: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Chat",
       required: true,
     },
-    senderId: {
+    sender: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
@@ -28,7 +28,7 @@ const messageSchema = new mongoose.Schema(
     },
     messageType: {
       type: String,
-      enum: ["text", "image", "file", "system"],
+      enum: ["text", "image", "video", "audio", "file"],
       default: "text",
     },
     readBy: [
