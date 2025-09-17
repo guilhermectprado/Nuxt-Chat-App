@@ -1,10 +1,17 @@
 <template>
-  <div class="bg-amber-900">
-    <h1>Chat App Nuxt</h1>
-    <p>Nome do Usuário</p>
+  <div class="flex gap-1 items-center">
+    <UAvatar src="/image.png" />
+    <p>
+      {{ userStore.user.fullName }}
+      <span class="text-muted text-sm">({{ userStore.user.username }})</span>
+    </p>
   </div>
 </template>
 
-<script setup></script>
+<script setup>
+import { useUserStore } from "~/store/useUserStore";
+
+const userStore = useUserStore();
+</script>
 
 <style lang="scss" scoped></style>

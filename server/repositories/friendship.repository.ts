@@ -1,5 +1,5 @@
 import Friendship from "../models/friendship";
-import { IFriendship } from "../types/friendship";
+import { IFriendship } from "../types/friendship.type";
 import { Types } from "mongoose";
 
 export class FriendshipRepository {

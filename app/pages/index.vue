@@ -1,15 +1,16 @@
 <template>
-  <div class="flex flex-col gap-4">
-    <section class="w-full flex justify-end">
-      <UButton @click="logout">Logout</UButton>
-    </section>
+  <div class="w-full h-dvh flex justify-center">
+    <div class="w-full h-full max-w-7xl flex flex-col gap-4">
+      <header class="flex justify-between gap-4">
+        <Profile />
+        <UButton @click="logout">Logout</UButton>
+      </header>
 
-    <Profile />
-
-    <section class="w-full flex gap-4">
-      <SideBar />
-      <Chat />
-    </section>
+      <main class="flex-1 grid grid-cols-2 rounded border border-indigo-400">
+        <SidebarList />
+        <Chat />
+      </main>
+    </div>
   </div>
 </template>
 
