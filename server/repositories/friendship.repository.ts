@@ -46,6 +46,48 @@ export class FriendshipRepository {
 
     return friendships as IFriendship[];
   }
+
+  async updateFriendRequestStatus(
+    currentUserId: string,
+    initiatorId: string,
+    status: "accepted" | "none"
+  ): Promise<IFriendship | null> {
+    const [userOne, userTwo] = [currentUserId, initiatorId].sort();
+
+    const friendship = await Friendship.findOneAndUpdate(
+      {
+        userOne: new Types.ObjectId(userOne),
+        userTwo: new Types.ObjectId(userTwo),
+        initiator: new Types.ObjectId(initiatorId), // Garante que só o destinatário pode aceitar/rejeitar
+        status: "pending", // Só pode alterar se estiver pendente
+      },
+      {
+        status,
+        updatedAt: new Date(),
+      },
+      {
+        new: true,
+        lean: true,
+      }
+    );
+
+    return friendship as IFriendship | null;
+  }
+
+  async getPendingFriendRequests(userId: string): Promise<IFriendship[]> {
+    const requests = await Friendship.find({
+      $or: [
+        { userOne: new Types.ObjectId(userId) },
+        { userTwo: new Types.ObjectId(userId) },
+      ],
+      initiator: { $ne: new Types.ObjectId(userId) },
+      status: "pending",
+    })
+      .populate("initiator", "name email avatar")
+      .lean();
+
+    return requests as IFriendship[];
+  }
 }
 
 export const friendshipRepository = new FriendshipRepository();

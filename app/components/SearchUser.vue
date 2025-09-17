@@ -66,12 +66,20 @@
                   v-if="searchedUser.relation === 'pending_received'"
                   class="space-x-2"
                 >
-                  <UButton icon="lucide:check" size="sm" variant="subtle" />
+                  <UButton
+                    icon="lucide:check"
+                    size="sm"
+                    variant="subtle"
+                    @click="updateInvite(searchedUser._id, 'accepted')"
+                    :loading="loadingUpdatedInvite[searchedUser._id]"
+                  />
                   <UButton
                     icon="lucide:x"
                     size="sm"
                     variant="subtle"
                     color="error"
+                    @click="updateInvite(searchedUser._id, 'none')"
+                    :loading="loadingUpdatedInvite[searchedUser._id]"
                   />
                 </div>
               </div>
@@ -88,11 +96,30 @@
 </template>
 
 <script setup lang="ts">
+import type { ToastProps } from "@nuxt/ui";
+const toast = useToast();
+const showToast = (
+  title: string,
+  description: string,
+  icon: string,
+  color: ToastProps["color"]
+) => {
+  toast.add({
+    title: title,
+    description: description,
+    icon: icon,
+    color: color,
+  });
+};
+
 const searchInput = ref<string>("");
 
 const loading = ref<boolean>(false);
 const data = ref<any>(undefined);
 const error = ref<any>(undefined);
+
+const loadingInvite = ref<Record<string, boolean>>({});
+const loadingUpdatedInvite = ref<Record<string, boolean>>({});
 
 const searchUsers = async () => {
   try {
@@ -124,8 +151,6 @@ watch(searchInput, (newValue) => {
   debouncedSearch();
 });
 
-const loadingInvite = ref<Record<string, boolean>>({});
-
 const sendInviteToFriend = async (userId: string) => {
   try {
     loadingInvite.value[userId] = true;
@@ -149,6 +174,46 @@ const sendInviteToFriend = async (userId: string) => {
     console.log(errorMessage);
   } finally {
     loadingInvite.value[userId] = false;
+  }
+};
+
+interface Props {
+  onFriendshipUpdated: () => void;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  onFriendshipUpdated: () => {},
+});
+
+const updateInvite = async (userId: string, status: string) => {
+  try {
+    loadingUpdatedInvite.value[userId] = true;
+
+    const response = await $fetch("/api/friendship/update-invite", {
+      method: "PUT",
+      body: {
+        fromUserId: userId,
+        status: status,
+      },
+    });
+
+    if (!response.success) throw response;
+
+    const userInvited = data.value.users.find(
+      (user: any) => user._id === userId
+    );
+
+    userInvited.relation = "friends";
+    props.onFriendshipUpdated();
+  } catch (error: any) {
+    showToast(
+      error.data.statusCode,
+      error.data.message,
+      "material-material-symbols-light:error",
+      "error"
+    );
+  } finally {
+    loadingUpdatedInvite.value[userId] = false;
   }
 };
 </script>

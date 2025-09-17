@@ -54,7 +54,7 @@ export default defineEventHandler(async (event) => {
         _id: userIdStr,
         fullName: user.fullName,
         username: user.username,
-        profileImage: user.profileImage || "",
+        profileImage: user.profileImage || null,
         relation,
       };
     });

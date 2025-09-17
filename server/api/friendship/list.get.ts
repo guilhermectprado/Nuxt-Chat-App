@@ -1,4 +1,3 @@
-// server/api/users/friends.get.ts
 import { friendshipRepository } from "~~/server/repositories/friendship.repository";
 import { userRepository } from "~~/server/repositories/user.repository";
 import { getIdUser } from "~~/server/utils/getIdUser";

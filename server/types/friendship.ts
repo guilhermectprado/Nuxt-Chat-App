@@ -4,7 +4,7 @@ export interface IFriendship {
   userOne: Types.ObjectId;
   userTwo: Types.ObjectId;
   initiator: Types.ObjectId;
-  status: "pending" | "accepted" | "rejected";
+  status: "pending" | "accepted" | "none";
   createdAt: Date;
   updatedAt: Date;
 }

@@ -18,7 +18,7 @@ const friendshipSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ["pending", "accepted", "rejected"],
+    enum: ["pending", "accepted", "none"],
     default: "pending",
   },
   createdAt: { type: Date, default: Date.now },
@@ -26,6 +26,9 @@ const friendshipSchema = new mongoose.Schema({
     type: Date,
   },
 });
+
+// Índice para evitar duplicatas
+friendshipSchema.index({ userOne: 1, userTwo: 1 }, { unique: true });
 
 const Friendship = mongoose.model("Friendship", friendshipSchema);
 export default Friendship;

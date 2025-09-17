@@ -71,7 +71,7 @@ const items = ref<TabsItem[]>([
   },
 ]);
 
-const { data, status, error } = await useFetch("/api/friendship/list");
+const { data, status, error, refresh } = await useFetch("/api/friendship/list");
 
 const search = ref<string>("");
 
@@ -80,7 +80,9 @@ const openSearchUsers = async () => {
 
   const modal = overlay.create(SearchUser);
 
-  modal.open();
+  modal.open({
+    onFriendshipUpdated: refresh,
+  });
 };
 </script>
 
