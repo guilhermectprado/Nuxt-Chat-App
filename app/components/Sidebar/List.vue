@@ -83,6 +83,7 @@ const items = ref<TabsItem[]>([
 
 const search = ref<string>("");
 
+// Isso é lista de amigos e não de chat!
 const { data, status, error, refresh } =
   await useFetch<IFriendshipListResponse>("/api/friendship/list");
 

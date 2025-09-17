@@ -32,10 +32,33 @@
         </div>
       </header>
 
-      <div class="flex-1 p-4 overflow-y-auto">
-        <div class="space-y-4">
-          <div class="text-center text-gray-500">
-            <p>Início da conversa com {{ activeChat.fullName }}</p>
+      <div
+        class="flex-1 overflow-y-auto p-4 flex flex-col-reverse gap-3 scroll-smooth"
+      >
+        <div
+          v-if="messages.length === 0"
+          class="flex-1 flex flex-col gap-2 justify-center items-center"
+        >
+          <UIcon name="lucide:message-square-plus" size="52" />
+          <h3 class="text-xl font-bold">Nenhuma mensagem ainda</h3>
+          <p class="text-muted">Comece uma conversa digitando algo abaixo!</p>
+        </div>
+
+        <div
+          v-if="messages.length > 0"
+          v-for="message in messages"
+          :key="message.id"
+          class="w-2/3 py-3 px-4 rounded wrap-break-word"
+          :class="
+            message.sender === 'user' ? 'self-end bg-sky-700' : 'bg-emerald-800'
+          "
+        >
+          {{ message.text }}
+          <div
+            class="text-sm opacity-70"
+            :class="message.sender === 'user' ? 'text-end' : ''"
+          >
+            {{ formatTime(message.timestamp) }}
           </div>
         </div>
       </div>
@@ -64,19 +87,78 @@
 
 <script setup lang="ts">
 const { activeChat } = useActiveChat();
-const messageInput = ref("");
 
-const sendMessage = () => {
+interface IMessage {
+  id: number;
+  text: string;
+  sender: string;
+  timestamp: Date;
+}
+
+const messages = ref<IMessage[]>([]);
+const messageInput = ref("");
+const isTyping = ref(false);
+
+const sendMessage = async () => {
   if (!messageInput.value.trim()) return;
 
-  // Aqui você implementará o envio da mensagem
-  console.log(
-    "Enviando mensagem:",
-    messageInput.value,
-    "para:",
-    activeChat.value?.fullName
-  );
+  const userMessage = {
+    id: Date.now(),
+    text: messageInput.value.trim(),
+    sender: "user",
+    timestamp: new Date(),
+  } as IMessage;
 
+  messages.value.unshift(userMessage);
   messageInput.value = "";
+
+  simulateResponse();
 };
+
+const simulateResponse = () => {
+  isTyping.value = true;
+
+  setTimeout(() => {
+    const responses = [
+      "Interessante! Conte-me mais sobre isso.",
+      "Entendo seu ponto de vista!",
+      "Que legal! Como você chegou a essa conclusão?",
+      "Isso faz muito sentido.",
+      "Obrigado por compartilhar isso comigo!",
+    ];
+
+    const friendMessage = {
+      id: Date.now() + 1,
+      text: responses[Math.floor(Math.random() * responses.length)],
+      sender: "friend",
+      timestamp: new Date(),
+    } as IMessage;
+
+    messages.value.unshift(friendMessage);
+    isTyping.value = false;
+  }, 1500);
+};
+
+const formatTime = (timestamp: Date) => {
+  return timestamp.toLocaleTimeString("pt-BR", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+};
+
+onMounted(() => {
+  setTimeout(() => {
+    messages.value.unshift({
+      id: 1,
+      text: "Olá! Bem-vindo ao chat. Digite algo para começarmos a conversar!",
+      sender: "friend",
+      timestamp: new Date(),
+    });
+  }, 1000);
+});
+
+// chat trocado →
+// limpa mensagens do chat antigo →
+// requisita ultimas 100 mensagens do chat atual →
+//
 </script>
