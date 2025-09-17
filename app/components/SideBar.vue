@@ -71,10 +71,7 @@ const items = ref<TabsItem[]>([
   },
 ]);
 
-const { data, status, error } = useAsyncData(
-  "list-friends",
-  async () => await $fetch("/api/friendship/list")
-);
+const { data, status, error } = await useFetch("/api/friendship/list");
 
 const search = ref<string>("");
 
