@@ -22,7 +22,7 @@ export default defineEventHandler(async (event) => {
 
     if (existingFriendship) {
       throw createError({
-        statusCode: 400,
+        statusCode: 409,
         message: "Solicitação já existe.",
       });
     }

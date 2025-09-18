@@ -19,6 +19,11 @@ export class FriendshipRepository {
     await friendship.save();
 
     const savedFriendship = await Friendship.findById(friendship._id).lean();
+
+    if (!savedFriendship) {
+      throw new Error("Erro ao criar amizade");
+    }
+
     return savedFriendship as IFriendship;
   }
 

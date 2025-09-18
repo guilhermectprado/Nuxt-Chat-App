@@ -7,7 +7,7 @@
       </header>
 
       <main class="flex-1 grid grid-cols-2 rounded border border-indigo-400">
-        <SidebarList />
+        <SidebarRoot />
         <Chat />
       </main>
     </div>

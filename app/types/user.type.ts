@@ -4,7 +4,7 @@ export interface IUser {
   password: string;
   fullName: string;
   username: string;
-  profileImage?: string;
+  profileImage: string;
   groups: string[];
   isOnline: boolean;
   lastSeen: Date;

@@ -23,10 +23,16 @@
               color: activeChat.isOnline ? 'primary' : 'neutral',
             }"
           />
+
           <div>
-            <h1 class="font-medium">{{ activeChat.fullName }}</h1>
+            <h1 class="font-medium">
+              {{ activeChat.participants[0].fullName }}
+              <span class="text-muted text-sm font-normal">
+                {{ activeChat.participants[0].username }}
+              </span>
+            </h1>
             <p class="text-sm text-muted">
-              {{ activeChat.isOnline ? "Online" : "Offline" }}
+              {{ activeChat.participants[0].isOnline ? "Online" : "Offline" }}
             </p>
           </div>
         </div>

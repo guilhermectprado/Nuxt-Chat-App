@@ -1,4 +1,6 @@
 export const useActiveChat = () => {
+  const listChats = useState<any>("listChats", () => null);
+
   const activeChat = useState<any>("activeChat", () => null);
 
   const setActiveChat = (friend: any) => {
@@ -10,6 +12,7 @@ export const useActiveChat = () => {
   };
 
   return {
+    listChats,
     activeChat: readonly(activeChat),
     setActiveChat,
     clearActiveChat,

@@ -113,11 +113,9 @@ const showToast = (
 };
 
 const searchInput = ref<string>("");
-
 const loading = ref<boolean>(false);
 const data = ref<any>(undefined);
 const error = ref<any>(undefined);
-
 const loadingInvite = ref<Record<string, boolean>>({});
 const loadingUpdatedInvite = ref<Record<string, boolean>>({});
 
@@ -138,18 +136,6 @@ const searchUsers = async () => {
     loading.value = false;
   }
 };
-
-const debouncedSearch = useDebounceFn(() => {
-  searchUsers();
-}, 500);
-
-watch(searchInput, (newValue) => {
-  if (!newValue || newValue.length < 2) {
-    data.value = [];
-    return;
-  }
-  debouncedSearch();
-});
 
 const sendInviteToFriend = async (userId: string) => {
   try {
@@ -177,14 +163,6 @@ const sendInviteToFriend = async (userId: string) => {
   }
 };
 
-interface Props {
-  onFriendshipUpdated: () => void;
-}
-
-const props = withDefaults(defineProps<Props>(), {
-  onFriendshipUpdated: () => {},
-});
-
 const updateInvite = async (userId: string, status: string) => {
   try {
     loadingUpdatedInvite.value[userId] = true;
@@ -203,8 +181,12 @@ const updateInvite = async (userId: string, status: string) => {
       (user: any) => user._id === userId
     );
 
-    userInvited.relation = "friends";
-    props.onFriendshipUpdated();
+    if (status === "accepted") {
+      userInvited.relation = "friends";
+      await refreshNuxtData("friends");
+    } else {
+      userInvited.relation = "none";
+    }
   } catch (error: any) {
     showToast(
       error.data.statusCode,
@@ -216,6 +198,18 @@ const updateInvite = async (userId: string, status: string) => {
     loadingUpdatedInvite.value[userId] = false;
   }
 };
+
+const debouncedSearch = useDebounceFn(() => {
+  searchUsers();
+}, 500);
+
+watch(searchInput, (newValue) => {
+  if (!newValue || newValue.length < 2) {
+    data.value = [];
+    return;
+  }
+  debouncedSearch();
+});
 </script>
 
 <style scoped></style>

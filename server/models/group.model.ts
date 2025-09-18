@@ -11,30 +11,6 @@ const groupSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
-    admin: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-    },
-    // SE GRUPO É UM TIPO DE CHAT, NAO PRECISA DE PARTICIPANTS AQUI
-    // participants: [
-    //   {
-    //     user: {
-    //       type: mongoose.Schema.Types.ObjectId,
-    //       ref: "User",
-    //       required: true,
-    //     },
-    //     role: {
-    //       type: String,
-    //       enum: ["admin", "moderator", "member"],
-    //       default: "member",
-    //     },
-    //     joinedAt: {
-    //       type: Date,
-    //       default: Date.now,
-    //     },
-    //   },
-    // ],
     image: {
       type: String,
       default: "",
@@ -42,6 +18,11 @@ const groupSchema = new mongoose.Schema(
     isPublic: {
       type: Boolean,
       default: false,
+    },
+    admin: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
     },
     chatRef: {
       type: mongoose.Schema.Types.ObjectId,
