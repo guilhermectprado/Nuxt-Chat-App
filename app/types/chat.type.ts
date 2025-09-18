@@ -30,5 +30,5 @@ export interface IChatListResponse {
 export interface IChatSingleResponse {
   success: boolean;
   chat: IChat;
-  count: number;
+  message: string;
 }

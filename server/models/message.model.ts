@@ -2,47 +2,36 @@ import mongoose from "mongoose";
 
 const messageSchema = new mongoose.Schema(
   {
-    chat: {
+    chatId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Chat",
       required: true,
     },
-    sender: {
+    senderId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
     },
-    content: {
-      text: {
-        type: String,
-        default: "",
-      },
-      image: {
-        type: String,
-        default: "",
-      },
-      file: {
-        type: String,
-        default: "",
-      },
-    },
-    messageType: {
+    text: {
       type: String,
-      enum: ["text", "image", "video", "audio", "file"],
-      default: "text",
+      default: "",
     },
-    readBy: [
-      {
-        userId: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "User",
-        },
-        readAt: {
-          type: Date,
-          default: Date.now,
-        },
-      },
-    ],
+    image: {
+      type: String,
+      default: "",
+    },
+    // readBy: [
+    //   {
+    //     userId: {
+    //       type: mongoose.Schema.Types.ObjectId,
+    //       ref: "User",
+    //     },
+    //     readAt: {
+    //       type: Date,
+    //       default: Date.now,
+    //     },
+    //   },
+    // ],
     repliedTo: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Message",
@@ -50,6 +39,9 @@ const messageSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+messageSchema.index({ chatId: 1, createdAt: -1 });
+messageSchema.index({ senderId: 1, createdAt: -1 });
 
 const Message = mongoose.model("Message", messageSchema);
 export default Message;

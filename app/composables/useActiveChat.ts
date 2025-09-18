@@ -1,7 +1,9 @@
+import type { IChat } from "~/types/chat.type";
+
 export const useActiveChat = () => {
   const listChats = useState<any>("listChats", () => null);
 
-  const activeChat = useState<any>("activeChat", () => null);
+  const activeChat = useState<IChat | null>("activeChat", () => null);
 
   const setActiveChat = (friend: any) => {
     activeChat.value = friend;

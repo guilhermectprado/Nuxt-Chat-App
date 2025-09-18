@@ -7,7 +7,11 @@ export const useUserStore = defineStore("user", {
     isAuthenticated: false,
   }),
 
-  getters: {},
+  getters: {
+    getUserId: (state) => {
+      return (state.user as any)._id;
+    },
+  },
 
   actions: {
     setUser(user: any) {

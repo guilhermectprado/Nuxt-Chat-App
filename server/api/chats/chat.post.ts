@@ -27,7 +27,6 @@ export default defineEventHandler(async (event) => {
       success: true,
       chat,
       message: isNewChat ? "Chat criado com sucesso" : "Chat já existia",
-      isNewChat,
     };
   } catch (error: any) {
     if (error.statusCode && error.statusCode !== 500) {

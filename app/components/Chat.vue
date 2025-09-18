@@ -17,22 +17,24 @@
       >
         <div class="flex items-center gap-3">
           <UAvatar
-            :src="activeChat.profileImage || '/image.png'"
+            :src="activeChat.participants[0]?.profileImage || '/image.png'"
             size="md"
             :chip="{
-              color: activeChat.isOnline ? 'primary' : 'neutral',
+              color: activeChat.participants[0]?.isOnline
+                ? 'primary'
+                : 'neutral',
             }"
           />
 
           <div>
             <h1 class="font-medium">
-              {{ activeChat.participants[0].fullName }}
+              {{ activeChat.participants[0]?.fullName }}
               <span class="text-muted text-sm font-normal">
-                {{ activeChat.participants[0].username }}
+                {{ activeChat.participants[0]?.username }}
               </span>
             </h1>
             <p class="text-sm text-muted">
-              {{ activeChat.participants[0].isOnline ? "Online" : "Offline" }}
+              {{ activeChat.participants[0]?.isOnline ? "Online" : "Offline" }}
             </p>
           </div>
         </div>
@@ -53,18 +55,22 @@
         <div
           v-if="messages.length > 0"
           v-for="message in messages"
-          :key="message.id"
+          :key="message._id"
           class="w-2/3 py-3 px-4 rounded wrap-break-word"
           :class="
-            message.sender === 'user' ? 'self-end bg-sky-700' : 'bg-emerald-800'
+            message.sender._id === userStore.getUserId()
+              ? 'self-end bg-sky-700'
+              : 'bg-emerald-800'
           "
         >
           {{ message.text }}
           <div
             class="text-sm opacity-70"
-            :class="message.sender === 'user' ? 'text-end' : ''"
+            :class="
+              message.sender._id === userStore.getUserId() ? 'text-end' : ''
+            "
           >
-            {{ formatTime(message.timestamp) }}
+            {{ message.createdAt }}
           </div>
         </div>
       </div>
@@ -92,58 +98,84 @@
 </template>
 
 <script setup lang="ts">
-const { activeChat } = useActiveChat();
+import { useUserStore } from "~/store/useUserStore";
+import type { IMessage, IMessageResponse } from "~/types/message.type";
 
-interface IMessage {
-  id: number;
-  text: string;
-  sender: string;
-  timestamp: Date;
-}
+const { activeChat } = useActiveChat();
+const userStore = useUserStore();
 
 const messages = ref<IMessage[]>([]);
-const messageInput = ref("");
-const isTyping = ref(false);
+const messageInput = ref<string>("");
+const image = ref<string>("");
+
+// const isTyping = ref(false);
+
+interface IBody {
+  image?: string;
+  text?: string;
+}
 
 const sendMessage = async () => {
-  if (!messageInput.value.trim()) return;
+  if (!messageInput.value.trim() && !image.value.trim()) return;
 
-  const userMessage = {
-    id: Date.now(),
-    text: messageInput.value.trim(),
-    sender: "user",
-    timestamp: new Date(),
-  } as IMessage;
+  try {
+    let body: IBody = {};
 
-  messages.value.unshift(userMessage);
-  messageInput.value = "";
+    if (image) body.image = image.value;
+    if (messageInput) body.text = messageInput.value;
 
-  simulateResponse();
+    const response = await $fetch<IMessageResponse>(
+      `/api/messages/${activeChat.value?._id}/send`,
+      {
+        method: "POST",
+        body: body,
+      }
+    );
+
+    if (!response.success) throw response;
+
+    messages.value.unshift(response.data);
+    messageInput.value = "";
+  } catch (error: any) {
+    console.log(`${error.data.statusCode} - ${error.data.message}`);
+  }
+
+  // const userMessage = {
+  //   id: Date.now(),
+  //   text: messageInput.value.trim(),
+  //   sender: "user",
+  //   timestamp: new Date(),
+  // } as IMessage;
+
+  // messages.value.unshift(userMessage);
+  // messageInput.value = "";
+
+  // simulateResponse();
 };
 
-const simulateResponse = () => {
-  isTyping.value = true;
+// const simulateResponse = () => {
+//   isTyping.value = true;
 
-  setTimeout(() => {
-    const responses = [
-      "Interessante! Conte-me mais sobre isso.",
-      "Entendo seu ponto de vista!",
-      "Que legal! Como você chegou a essa conclusão?",
-      "Isso faz muito sentido.",
-      "Obrigado por compartilhar isso comigo!",
-    ];
+//   setTimeout(() => {
+//     const responses = [
+//       "Interessante! Conte-me mais sobre isso.",
+//       "Entendo seu ponto de vista!",
+//       "Que legal! Como você chegou a essa conclusão?",
+//       "Isso faz muito sentido.",
+//       "Obrigado por compartilhar isso comigo!",
+//     ];
 
-    const friendMessage = {
-      id: Date.now() + 1,
-      text: responses[Math.floor(Math.random() * responses.length)],
-      sender: "friend",
-      timestamp: new Date(),
-    } as IMessage;
+//     const friendMessage = {
+//       id: Date.now() + 1,
+//       text: responses[Math.floor(Math.random() * responses.length)],
+//       sender: "friend",
+//       timestamp: new Date(),
+//     } as IMessage;
 
-    messages.value.unshift(friendMessage);
-    isTyping.value = false;
-  }, 1500);
-};
+//     messages.value.unshift(friendMessage);
+//     isTyping.value = false;
+//   }, 1500);
+// };
 
 const formatTime = (timestamp: Date) => {
   return timestamp.toLocaleTimeString("pt-BR", {
@@ -152,16 +184,16 @@ const formatTime = (timestamp: Date) => {
   });
 };
 
-onMounted(() => {
-  setTimeout(() => {
-    messages.value.unshift({
-      id: 1,
-      text: "Olá! Bem-vindo ao chat. Digite algo para começarmos a conversar!",
-      sender: "friend",
-      timestamp: new Date(),
-    });
-  }, 1000);
-});
+// onMounted(() => {
+//   setTimeout(() => {
+//     messages.value.unshift({
+//       id: 1,
+//       text: "Olá! Bem-vindo ao chat. Digite algo para começarmos a conversar!",
+//       sender: "friend",
+//       timestamp: new Date(),
+//     });
+//   }, 1000);
+// });
 
 // chat trocado →
 // limpa mensagens do chat antigo →
