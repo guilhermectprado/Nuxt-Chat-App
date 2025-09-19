@@ -4,13 +4,16 @@
   >
     <header class="flex items-center justify-between">
       <div class="flex gap-1 items-center">
-        <UAvatar src="/image.png" />
-        <p>
-          {{ userStore.user?.fullName }}
-          <span class="text-muted text-sm"
-            >({{ userStore.user?.username }})</span
-          >
-        </p>
+        <UAvatar src="/image.png" size="2xl" />
+
+        <div class="flex flex-col">
+          <div class="font-medium">
+            {{ userStore.user?.fullName }}
+          </div>
+          <div class="text-muted text-xs">
+            {{ userStore.user?.username }}
+          </div>
+        </div>
       </div>
 
       <UButton

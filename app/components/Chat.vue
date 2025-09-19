@@ -66,7 +66,11 @@
           <p class="text-muted">Comece uma conversa digitando algo abaixo!</p>
         </div>
 
-        <div v-else ref="chatBox" class="h-full overflow-y-auto">
+        <div
+          v-else
+          ref="chatBox"
+          class="h-full overflow-y-auto custom-scrollbar"
+        >
           <template v-for="(group, date) in groupedMessages" :key="date">
             <div class="flex justify-center my-4">
               <div
@@ -91,14 +95,7 @@
                   {{ message.text }}
                 </p>
 
-                <div
-                  class="text-xs opacity-75"
-                  :class="
-                    message.sender._id === currentUserId
-                      ? 'text-end'
-                      : 'text-start'
-                  "
-                >
+                <div class="text-xs text-muted text-end">
                   {{ formatTime(message.createdAt) }}
                 </div>
               </div>
@@ -137,6 +134,11 @@ import type {
   IMessagePostResponse,
 } from "~/types/message.type";
 
+interface IBody {
+  image?: string;
+  text?: string;
+}
+
 const { activeChat } = useActiveChat();
 const userStore = useUserStore();
 
@@ -166,10 +168,13 @@ const groupedMessages = computed(() => {
   return groups;
 });
 
-interface IBody {
-  image?: string;
-  text?: string;
-}
+const scrollToBottom = () => {
+  nextTick(() => {
+    if (chatBox.value) {
+      chatBox.value.scrollTop = chatBox.value.scrollHeight;
+    }
+  });
+};
 
 const sendMessage = async () => {
   if (!messageInput.value.trim() && !image.value.trim()) return;
@@ -193,6 +198,8 @@ const sendMessage = async () => {
     messages.value.push(response.data);
     messageInput.value = "";
     image.value = "";
+
+    scrollToBottom();
   } catch (error: any) {
     console.log(
       `${error.status || "Erro"} - ${error.message || "Erro desconhecido"}`
@@ -200,7 +207,7 @@ const sendMessage = async () => {
   }
 };
 
-const { data, status, error, refresh } = useAsyncData(
+const { data, status, error } = useAsyncData(
   () => `messages-${chatId.value}`,
   async () => {
     if (!activeChat.value?._id) return null;
@@ -208,6 +215,7 @@ const { data, status, error, refresh } = useAsyncData(
     const response = await $fetch<IMessageGetResponse>(
       `/api/messages/${activeChat.value._id}/list`
     );
+
     return response;
   },
   {
@@ -218,10 +226,19 @@ const { data, status, error, refresh } = useAsyncData(
 );
 
 watch(
+  messages,
+  () => {
+    scrollToBottom();
+  },
+  { deep: true }
+);
+
+watch(
   data,
   (newData) => {
     if (newData?.success && newData?.data) {
       messages.value = newData.data;
+      scrollToBottom();
     }
   },
   { immediate: true }
@@ -231,12 +248,11 @@ watch(
   () => activeChat.value?._id,
   (newId) => {
     chatId.value = newId;
-    chatBox.value?.scrollIntoView({ behavior: "smooth" });
   }
 );
 
 onMounted(() => {
-  console.log("aa");
+  scrollToBottom();
 });
 </script>
 
