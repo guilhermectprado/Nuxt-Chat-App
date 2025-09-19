@@ -23,4 +23,10 @@ export default defineNuxtConfig({
     NODE_ENV: "development",
     public: {},
   },
+  plugins: ["./app/plugins/socket.client.ts"],
+  nitro: {
+    experimental: {
+      websocket: true,
+    },
+  },
 });
