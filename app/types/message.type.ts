@@ -11,7 +11,13 @@ export interface IMessage {
   updatedAt: Date;
 }
 
-export interface IMessageResponse {
+export interface IMessageGetResponse {
+  success: boolean;
+  data: IMessage[];
+  count: number;
+}
+
+export interface IMessagePostResponse {
   success: boolean;
   data: IMessage;
   message: string;

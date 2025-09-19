@@ -41,15 +41,7 @@ export default defineEventHandler(async (event) => {
 
     return {
       success: true,
-      user: {
-        email: user.email,
-        fullName: user.fullName,
-        username: user.username,
-        profileImage: user.profileImage,
-        groups: user.groups,
-        isOnline: user.isOnline,
-        lastSeen: user.lastSeen,
-      },
+      user,
     };
   } catch (error: any) {
     if (error.statusCode && error.statusCode !== 500) {

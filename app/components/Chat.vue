@@ -25,7 +25,6 @@
                 : 'neutral',
             }"
           />
-
           <div>
             <h1 class="font-medium">
               {{ activeChat.participants[0]?.fullName }}
@@ -40,11 +39,26 @@
         </div>
       </header>
 
-      <div
-        class="flex-1 overflow-y-auto p-4 flex flex-col-reverse gap-3 scroll-smooth"
-      >
+      <div class="flex-1 overflow-y-auto flex flex-col gap-3 scroll-smooth">
         <div
-          v-if="messages.length === 0"
+          v-if="status === 'pending'"
+          class="flex-1 flex justify-center items-center"
+        >
+          <UIcon name="lucide:loader-2" size="32" class="animate-spin" />
+        </div>
+
+        <div
+          v-else-if="error"
+          class="flex-1 flex flex-col gap-2 justify-center items-center text-red-500"
+        >
+          <UIcon name="lucide:alert-circle" size="52" />
+          <h3 class="text-xl font-bold">Erro ao carregar mensagens</h3>
+          <p class="text-muted">{{ error.message }}</p>
+          <UButton variant="outline">Tentar novamente</UButton>
+        </div>
+
+        <div
+          v-else-if="messages.length === 0"
           class="flex-1 flex flex-col gap-2 justify-center items-center"
         >
           <UIcon name="lucide:message-square-plus" size="52" />
@@ -52,30 +66,49 @@
           <p class="text-muted">Comece uma conversa digitando algo abaixo!</p>
         </div>
 
-        <div
-          v-if="messages.length > 0"
-          v-for="message in messages"
-          :key="message._id"
-          class="w-2/3 py-3 px-4 rounded wrap-break-word"
-          :class="
-            message.sender._id === userStore.getUserId()
-              ? 'self-end bg-sky-700'
-              : 'bg-emerald-800'
-          "
-        >
-          {{ message.text }}
-          <div
-            class="text-sm opacity-70"
-            :class="
-              message.sender._id === userStore.getUserId() ? 'text-end' : ''
-            "
-          >
-            {{ message.createdAt }}
-          </div>
+        <div v-else class="h-[710px] flex flex-col gap-2 overflow-y-auto">
+          <template v-for="(group, date) in groupedMessages" :key="date">
+            <div class="flex justify-center my-4">
+              <div
+                class="bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-full text-sm text-gray-600 dark:text-gray-300"
+              >
+                {{ formatDateChip(date) }}
+              </div>
+            </div>
+
+            <div class="flex flex-col gap-2 p-4">
+              <div
+                v-for="message in group"
+                :key="message._id"
+                class="w-2/3 py-3 px-4 rounded-lg wrap-break-word transition-colors"
+                :class="
+                  message.sender._id === currentUserId
+                    ? 'bg-emerald-800  self-end text-white'
+                    : 'bg-sky-800  self-start text-white'
+                "
+              >
+                <div class="mb-2">
+                  {{ message.text }}
+                </div>
+
+                <div
+                  class="text-xs opacity-75"
+                  :class="
+                    message.sender._id === currentUserId
+                      ? 'text-end'
+                      : 'text-start'
+                  "
+                >
+                  {{ formatTime(message.createdAt) }}
+                </div>
+              </div>
+            </div>
+          </template>
         </div>
       </div>
 
       <footer
+        ref="chatBox"
         class="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 p-4 rounded-b"
       >
         <div class="flex gap-2">
@@ -99,16 +132,40 @@
 
 <script setup lang="ts">
 import { useUserStore } from "~/store/useUserStore";
-import type { IMessage, IMessageResponse } from "~/types/message.type";
+import type {
+  IMessage,
+  IMessageGetResponse,
+  IMessagePostResponse,
+} from "~/types/message.type";
 
 const { activeChat } = useActiveChat();
 const userStore = useUserStore();
 
+const chatBox = useTemplateRef("chatBox");
+const chatId = ref(activeChat.value?._id);
 const messages = ref<IMessage[]>([]);
 const messageInput = ref<string>("");
 const image = ref<string>("");
 
-// const isTyping = ref(false);
+const currentUserId = computed(() => {
+  return userStore.user?._id || "";
+});
+
+const groupedMessages = computed(() => {
+  const groups: Record<string, IMessage[]> = {};
+
+  messages.value.forEach((message) => {
+    const dateKey = new Date(message.createdAt).toDateString();
+
+    if (!groups[dateKey]) {
+      groups[dateKey] = [];
+    }
+
+    groups[dateKey].push(message);
+  });
+
+  return groups;
+});
 
 interface IBody {
   image?: string;
@@ -121,11 +178,11 @@ const sendMessage = async () => {
   try {
     let body: IBody = {};
 
-    if (image) body.image = image.value;
-    if (messageInput) body.text = messageInput.value;
+    if (image.value) body.image = image.value;
+    if (messageInput.value) body.text = messageInput.value;
 
-    const response = await $fetch<IMessageResponse>(
-      `/api/messages/${activeChat.value?._id}/send`,
+    const response = await $fetch<IMessagePostResponse>(
+      `/api/messages/${chatId.value}/send`,
       {
         method: "POST",
         body: body,
@@ -134,69 +191,60 @@ const sendMessage = async () => {
 
     if (!response.success) throw response;
 
-    messages.value.unshift(response.data);
+    messages.value.push(response.data);
     messageInput.value = "";
+    image.value = "";
   } catch (error: any) {
-    console.log(`${error.data.statusCode} - ${error.data.message}`);
+    console.log(
+      `${error.status || "Erro"} - ${error.message || "Erro desconhecido"}`
+    );
   }
-
-  // const userMessage = {
-  //   id: Date.now(),
-  //   text: messageInput.value.trim(),
-  //   sender: "user",
-  //   timestamp: new Date(),
-  // } as IMessage;
-
-  // messages.value.unshift(userMessage);
-  // messageInput.value = "";
-
-  // simulateResponse();
 };
 
-// const simulateResponse = () => {
-//   isTyping.value = true;
+const { data, status, error, refresh } = useAsyncData(
+  () => `messages-${chatId.value}`,
+  async () => {
+    if (!activeChat.value?._id) return null;
 
-//   setTimeout(() => {
-//     const responses = [
-//       "Interessante! Conte-me mais sobre isso.",
-//       "Entendo seu ponto de vista!",
-//       "Que legal! Como você chegou a essa conclusão?",
-//       "Isso faz muito sentido.",
-//       "Obrigado por compartilhar isso comigo!",
-//     ];
+    const response = await $fetch<IMessageGetResponse>(
+      `/api/messages/${activeChat.value._id}/list`
+    );
+    return response;
+  },
+  {
+    watch: [() => activeChat.value?._id],
+    immediate: false,
+    server: false,
+  }
+);
 
-//     const friendMessage = {
-//       id: Date.now() + 1,
-//       text: responses[Math.floor(Math.random() * responses.length)],
-//       sender: "friend",
-//       timestamp: new Date(),
-//     } as IMessage;
+watch(
+  data,
+  (newData) => {
+    if (newData?.success && newData?.data) {
+      messages.value = newData.data;
+    }
+  },
+  { immediate: true }
+);
 
-//     messages.value.unshift(friendMessage);
-//     isTyping.value = false;
-//   }, 1500);
-// };
+watch(
+  () => activeChat.value?._id,
+  (newId) => {
+    chatId.value = newId;
+    chatBox.value?.scrollIntoView({ behavior: "smooth" });
+  }
+);
 
-const formatTime = (timestamp: Date) => {
-  return timestamp.toLocaleTimeString("pt-BR", {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-};
-
-// onMounted(() => {
-//   setTimeout(() => {
-//     messages.value.unshift({
-//       id: 1,
-//       text: "Olá! Bem-vindo ao chat. Digite algo para começarmos a conversar!",
-//       sender: "friend",
-//       timestamp: new Date(),
-//     });
-//   }, 1000);
-// });
-
-// chat trocado →
-// limpa mensagens do chat antigo →
-// requisita ultimas 100 mensagens do chat atual →
-//
+onMounted(() => {
+  console.log("aa");
+});
 </script>
+
+<style scoped>
+.wrap-break-word {
+  word-wrap: break-word;
+  word-break: break-word;
+  hyphens: auto;
+}
+</style>

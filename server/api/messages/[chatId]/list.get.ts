@@ -1,7 +1,4 @@
-import cloudinary from "~~/server/lib/cloudinary";
 import { messageRepository } from "~~/server/repositories/message.repository";
-import { IMessage, IMessagePopulated } from "~~/server/types/message.type";
-import { getIdUser } from "~~/server/utils/getIdUser";
 
 export default defineEventHandler(async (event) => {
   try {

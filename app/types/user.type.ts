@@ -11,3 +11,8 @@ export interface IUser {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export interface IUserStore {
+  user: IUser | null;
+  isAuthenticated: boolean;
+}

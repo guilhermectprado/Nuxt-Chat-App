@@ -1,6 +1,6 @@
 import cloudinary from "~~/server/lib/cloudinary";
 import { messageRepository } from "~~/server/repositories/message.repository";
-import { IMessage } from "~~/server/types/message.type";
+import { IMessagePopulated } from "~~/server/types/message.type";
 import { getIdUser } from "~~/server/utils/getIdUser";
 
 export default defineEventHandler(async (event) => {
@@ -59,7 +59,7 @@ export default defineEventHandler(async (event) => {
 
     return {
       success: true,
-      data: createdMessage as IMessage,
+      data: createdMessage as IMessagePopulated,
       message: "Mensagem enviada com sucesso.",
     };
   } catch (error: any) {

@@ -1,5 +1,5 @@
 import Message from "../models/message.model";
-import { IMessage, IMessagePopulated } from "../types/message.type";
+import { IMessagePopulated } from "../types/message.type";
 
 interface CreateMessageParams {
   chatId: string;
@@ -10,7 +10,7 @@ interface CreateMessageParams {
 }
 
 export class MessageRepository {
-  async createMessage(params: CreateMessageParams): Promise<IMessage> {
+  async createMessage(params: CreateMessageParams): Promise<IMessagePopulated> {
     const { chatId, userId, text = "", imageUrl = "", repliedTo } = params;
 
     const messageData: any = {
@@ -27,15 +27,52 @@ export class MessageRepository {
     const message = new Message(messageData);
     await message.save();
 
-    return message as IMessage;
+    const savedMessages = await this.getMessageById(message.id);
+
+    return savedMessages as IMessagePopulated;
   }
 
-  async getMessageById(messageId: string): Promise<IMessage> {
-    const message = await Message.findById(messageId).lean();
+  async getMessageById(messageId: string): Promise<IMessagePopulated> {
+    const message = await Message.findById(messageId)
+      .populate({
+        path: "senderId",
+        select: "fullName profileImage",
+      })
+      .populate({
+        path: "repliedTo",
+        select: "text image createdAt updatedAt",
+        populate: {
+          path: "senderId",
+          select: "fullName profileImage",
+        },
+      })
+      .lean()
+      .exec();
+
     if (!message) {
       throw new Error("Mensagem não encontrada");
     }
-    return message as unknown as IMessage;
+
+    const { senderId, repliedTo, ...rest } = message;
+
+    const transformedMessage: any = {
+      ...rest,
+      sender: senderId,
+    };
+
+    const repliedToPopulated = repliedTo as any;
+    if (repliedToPopulated && typeof repliedToPopulated === "object") {
+      transformedMessage.repliedTo = {
+        _id: repliedToPopulated._id,
+        text: repliedToPopulated.text,
+        image: repliedToPopulated.image,
+        createdAt: repliedToPopulated.createdAt,
+        updatedAt: repliedToPopulated.updatedAt,
+        sender: repliedToPopulated.senderId,
+      };
+    }
+
+    return transformedMessage as IMessagePopulated;
   }
 
   async findMessagesChats(chatId: string): Promise<IMessagePopulated[]> {
@@ -44,17 +81,16 @@ export class MessageRepository {
     })
       .populate({
         path: "senderId",
-        select: "name profileImage",
+        select: "fullName profileImage",
       })
       .populate({
         path: "repliedTo",
         select: "text image createdAt updatedAt",
         populate: {
           path: "senderId",
-          select: "name profileImage",
+          select: "fullName profileImage",
         },
       })
-      .sort({ createdAt: -1 })
       .lean()
       .exec();
 

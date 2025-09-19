@@ -17,8 +17,8 @@ export interface IChat {
   lastMessageText: string;
   lastMessageTimestamp: Date;
   lastMessageSender: IUser;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: String;
+  updatedAt: String;
 }
 
 export interface IChatListResponse {
