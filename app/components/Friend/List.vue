@@ -1,6 +1,6 @@
 <template>
   <section class="space-y-4">
-    <header class="flex justify-between">
+    <header class="flex justify-between gap-4 items-center">
       <UButton
         icon="lucide:move-left"
         label="Voltar"
@@ -8,17 +8,17 @@
         @click="emit('toggleList', 'chatsList')"
       />
 
+      <UInput v-model="search" icon="lucide:user-search" class="w-full" />
+
       <UButton
         icon="lucide:user-round-plus"
-        label="Adicionar Amigo"
+        label="Adicionar"
         variant="ghost"
         @click="openSearchUsers"
       />
     </header>
 
     <main class="space-y-4">
-      <UInput v-model="search" icon="lucide:user-search" class="w-full" />
-
       <ul v-if="status === 'pending'" class="flex flex-col gap-1">
         <li v-for="index in 5" :key="index">
           <div class="flex items-center gap-2 p-4 rounded">
@@ -63,7 +63,7 @@
 <script setup lang="ts">
 import type { IUser } from "~/types/user.type";
 import type { IFriendshipListResponse } from "~/types/friendship.type";
-import { SidebarSearchUser } from "#components";
+import { FriendSearchUser } from "#components";
 import type { IChat, IChatSingleResponse } from "~/types/chat.type";
 
 const emit = defineEmits(["toggleList"]);
@@ -95,7 +95,7 @@ const filteredFriends = computed(() => {
 const openSearchUsers = async () => {
   const overlay = useOverlay();
 
-  const modal = overlay.create(SidebarSearchUser);
+  const modal = overlay.create(FriendSearchUser);
 
   modal.open();
 };

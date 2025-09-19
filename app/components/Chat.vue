@@ -1,5 +1,5 @@
 <template>
-  <section class="flex flex-col">
+  <section class="flex flex-col h-full overflow-hidden">
     <div v-if="!activeChat" class="flex-1 flex items-center justify-center">
       <div class="text-center text-white">
         <Icon
@@ -11,9 +11,9 @@
       </div>
     </div>
 
-    <div v-else class="flex-1 flex flex-col">
+    <div v-else class="flex flex-col h-full overflow-hidden">
       <header
-        class="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 p-4 rounded-t"
+        class="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 p-4 rounded-t flex-shrink-0"
       >
         <div class="flex items-center gap-3">
           <UAvatar
@@ -39,17 +39,17 @@
         </div>
       </header>
 
-      <div class="flex-1 overflow-y-auto flex flex-col gap-3 scroll-smooth">
+      <main class="flex-1 overflow-hidden">
         <div
           v-if="status === 'pending'"
-          class="flex-1 flex justify-center items-center"
+          class="h-full flex justify-center items-center"
         >
           <UIcon name="lucide:loader-2" size="32" class="animate-spin" />
         </div>
 
         <div
           v-else-if="error"
-          class="flex-1 flex flex-col gap-2 justify-center items-center text-red-500"
+          class="h-full flex flex-col gap-2 justify-center items-center text-red-500"
         >
           <UIcon name="lucide:alert-circle" size="52" />
           <h3 class="text-xl font-bold">Erro ao carregar mensagens</h3>
@@ -59,14 +59,14 @@
 
         <div
           v-else-if="messages.length === 0"
-          class="flex-1 flex flex-col gap-2 justify-center items-center"
+          class="h-full flex flex-col gap-2 justify-center items-center"
         >
           <UIcon name="lucide:message-square-plus" size="52" />
           <h3 class="text-xl font-bold">Nenhuma mensagem ainda</h3>
           <p class="text-muted">Comece uma conversa digitando algo abaixo!</p>
         </div>
 
-        <div v-else class="h-[710px] flex flex-col gap-2 overflow-y-auto">
+        <div v-else ref="chatBox" class="h-full overflow-y-auto">
           <template v-for="(group, date) in groupedMessages" :key="date">
             <div class="flex justify-center my-4">
               <div
@@ -87,9 +87,9 @@
                     : 'bg-sky-800  self-start text-white'
                 "
               >
-                <div class="mb-2">
+                <p class="mb-2">
                   {{ message.text }}
-                </div>
+                </p>
 
                 <div
                   class="text-xs opacity-75"
@@ -105,26 +105,25 @@
             </div>
           </template>
         </div>
-      </div>
+      </main>
 
       <footer
-        ref="chatBox"
-        class="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 p-4 rounded-b"
+        class="flex gap-2 items-end bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 p-4 rounded-b"
       >
-        <div class="flex gap-2">
-          <UTextarea
-            v-model="messageInput"
-            placeholder="Digite sua mensagem..."
-            :rows="1"
-            class="flex-1"
-            @keydown.enter.prevent="sendMessage"
-          />
-          <UButton
-            icon="lucide:send"
-            @click="sendMessage"
-            :disabled="!messageInput.trim()"
-          />
-        </div>
+        <UTextarea
+          v-model="messageInput"
+          :rows="1"
+          :maxrows="4"
+          autoresize
+          class="flex-1"
+          placeholder="Digite sua mensagem..."
+          @keydown.enter.prevent="sendMessage"
+        />
+        <UButton
+          icon="lucide:send"
+          @click="sendMessage"
+          :disabled="!messageInput.trim()"
+        />
       </footer>
     </div>
   </section>

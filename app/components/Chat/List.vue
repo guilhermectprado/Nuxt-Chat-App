@@ -1,17 +1,17 @@
 <template>
   <section class="space-y-4">
-    <header class="flex justify-end">
+    <header class="flex justify-between gap-4 items-center">
+      <UInput v-model="search" icon="lucide:user-search" class="w-full" />
+
       <UButton
-        icon="lucide:message-circle-plus"
-        label="Novo Chat"
+        icon="lucide:users"
+        label="Amigos"
         variant="ghost"
         @click="emit('toggleList', 'friendsList')"
       />
     </header>
 
     <main class="space-y-4">
-      <UInput v-model="search" icon="lucide:user-search" class="w-full" />
-
       <UTabs
         v-model="typeChats"
         color="neutral"
