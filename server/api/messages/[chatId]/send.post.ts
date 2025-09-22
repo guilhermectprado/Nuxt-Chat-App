@@ -1,5 +1,6 @@
 import cloudinary from "~~/server/lib/cloudinary";
 import { getSocketIO } from "~~/server/plugins/socket";
+import { chatRepository } from "~~/server/repositories/chat.repository";
 import { messageRepository } from "~~/server/repositories/message.repository";
 import { IMessagePopulated } from "~~/server/types/message.type";
 import { getIdUser } from "~~/server/utils/getIdUser";
@@ -56,6 +57,12 @@ export default defineEventHandler(async (event) => {
       text,
       imageUrl,
       repliedTo,
+    });
+
+    await chatRepository.updateLastMessageChat(chatId, {
+      lastMessageText: text || "📷 Imagem",
+      lastMessageSender: userId,
+      lastMessageTimestamp: new Date(),
     });
 
     const io = getSocketIO();

@@ -49,6 +49,7 @@ export class ChatRepository {
     return chats;
   }
 
+  // Para chats privados entre dois usuários
   async findChatBetweenUsers(
     userId1: string,
     userId2: string
@@ -67,25 +68,38 @@ export class ChatRepository {
     return chat;
   }
 
-  // async findChatById(chatId: string): Promise<IChatPopulated | null> {
-  //   const chat = await Chat.findById(chatId)
-  //     .populate<{ participants: IUser[] }>({
-  //       path: "participants",
-  //       select: "fullName username profileImage isOnline",
-  //     })
-  //     .populate<{ groupRef: IGroup }>({
-  //       path: "groupRef",
-  //       select: "name image",
-  //     })
-  //     .populate<{ lastMessageSender: IUser }>({
-  //       path: "lastMessageSender",
-  //       select: "fullName",
-  //     })
-  //     .lean<IChatPopulated>()
-  //     .exec();
+  // Não está em uso no momento, mas pode ser útil para o futuro
+  async findChatById(chatId: string): Promise<IChat | null> {
+    const chat = await Chat.findById(chatId)
+      .populate<{ participants: IUser[] }>({
+        path: "participants",
+        select: "fullName username profileImage isOnline",
+      })
+      .populate<{ groupRef: IGroup }>({
+        path: "groupRef",
+        select: "name image",
+      })
+      .populate<{ lastMessageSender: IUser }>({
+        path: "lastMessageSender",
+        select: "fullName",
+      })
+      .lean<IChat>()
+      .exec();
 
-  //   return chat;
-  // }
+    return chat;
+  }
+
+  async updateLastMessageChat(chatId: string, data: any) {
+    const updatedChat = await Chat.findByIdAndUpdate(
+      chatId,
+      {
+        $set: data,
+      },
+      { new: true, lean: true }
+    );
+
+    return updatedChat;
+  }
 }
 
 export const chatRepository = new ChatRepository();
