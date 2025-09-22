@@ -67,7 +67,7 @@ import { FriendSearchUser } from "#components";
 import type { IChat, IChatSingleResponse } from "~/types/chat.type";
 
 const emit = defineEmits(["toggleList"]);
-const { setActiveChat } = useActiveChat();
+const { setActiveChat } = useChatComposable();
 
 const search = ref<string>("");
 

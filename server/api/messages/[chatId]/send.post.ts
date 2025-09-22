@@ -1,4 +1,5 @@
 import cloudinary from "~~/server/lib/cloudinary";
+import { getSocketIO } from "~~/server/plugins/socket";
 import { messageRepository } from "~~/server/repositories/message.repository";
 import { IMessagePopulated } from "~~/server/types/message.type";
 import { getIdUser } from "~~/server/utils/getIdUser";
@@ -56,6 +57,13 @@ export default defineEventHandler(async (event) => {
       imageUrl,
       repliedTo,
     });
+
+    const io = getSocketIO();
+    if (io) {
+      io.to(`chat-${chatId}`).emit("new-message", {
+        ...createdMessage,
+      });
+    }
 
     return {
       success: true,

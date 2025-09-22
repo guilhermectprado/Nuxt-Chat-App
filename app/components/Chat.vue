@@ -139,7 +139,7 @@ interface IBody {
   text?: string;
 }
 
-const { activeChat } = useActiveChat();
+const { activeChat } = useChatComposable();
 const userStore = useUserStore();
 
 const chatBox = useTemplateRef("chatBox");
@@ -195,7 +195,6 @@ const sendMessage = async () => {
 
     if (!response.success) throw response;
 
-    messages.value.push(response.data);
     messageInput.value = "";
     image.value = "";
 
@@ -253,6 +252,18 @@ watch(
 
 onMounted(() => {
   scrollToBottom();
+});
+
+const { socket } = useSocketComposable();
+
+onMounted(() => {
+  if (socket) {
+    socket.on("new-message", (message) => {
+      if (message.chatId !== chatId.value) return;
+
+      messages.value.push(message);
+    });
+  }
 });
 </script>
 

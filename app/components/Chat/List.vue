@@ -79,7 +79,7 @@ import type { IChat, IChatListResponse } from "~/types/chat.type";
 
 const emit = defineEmits(["toggleList"]);
 
-const { setActiveChat, activeChat } = useActiveChat();
+const { setActiveChat, activeChat } = useChatComposable();
 
 const { data, status, error, refresh } = await useFetch<IChatListResponse>(
   "/api/chats/list",
@@ -136,6 +136,19 @@ const filterByType = (chats: any, type: string) => {
 const openChat = (friend: any) => {
   setActiveChat(friend);
 };
+
+const { joinUserChats } = useChatComposable();
+
+watch(
+  () => data,
+  (newValue) => {
+    if (newValue.value) {
+      const chatIds = newValue.value.chats.map((chat) => chat._id);
+      joinUserChats(chatIds);
+    }
+  },
+  { immediate: true }
+);
 </script>
 
 <style scoped></style>

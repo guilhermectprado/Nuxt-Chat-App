@@ -22,3 +22,12 @@ export interface IMessagePostResponse {
   data: IMessage;
   message: string;
 }
+
+export interface IMessageSocketResponse {
+  chatId: string;
+  sender: IUser;
+  text: string;
+  image: string;
+  repliedTo?: IMessage;
+  timestamp: string;
+}
