@@ -21,12 +21,8 @@ export default defineNuxtConfig({
     JWT_SECRET: process.env.JWT_SECRET,
     MONGODB_URI: process.env.MONGODB_URI,
     NODE_ENV: "development",
-    public: {},
-  },
-  plugins: ["./app/plugins/socket.client.ts"],
-  nitro: {
-    experimental: {
-      websocket: true,
+    public: {
+      socketUrl: process.env.NUXT_PUBLIC_SOCKET_URL || "http://localhost:3000",
     },
   },
 });
