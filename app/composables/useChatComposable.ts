@@ -1,14 +1,22 @@
 import type { IChat } from "~/types/chat.type";
 import { useUserStore } from "~/store/useUserStore";
+import type { IMessageSocketResponse } from "~/types/message.type";
 
 export const useChatComposable = () => {
   const userStore = useUserStore();
   const { socket } = useSocketComposable();
 
   const activeChat = useState<IChat | null>("activeChat", () => null);
+  const unreadMessages = useState<
+    Map<string, { count: number; lastMessage: any }>
+  >("unreadMessages", () => new Map());
 
   const setActiveChat = (friend: any) => {
     activeChat.value = friend;
+
+    if (friend?._id && unreadMessages.value.has(friend._id)) {
+      unreadMessages.value.delete(friend._id);
+    }
   };
 
   const clearActiveChat = () => {
@@ -18,16 +26,38 @@ export const useChatComposable = () => {
   const joinUserChats = async (userChats: string[]) => {
     if (!socket) return;
 
-    console.log(userChats);
-
     userChats.forEach((chat) => {
       socket.emit("join-chat", {
         chatId: chat,
         userId: userStore.getUserId,
       });
     });
+  };
 
-    console.log("acabou composable");
+  const addUnreadMessage = async (message: IMessageSocketResponse) => {
+    const current = unreadMessages.value.get(message.chatId);
+    const newCount = current ? current.count + 1 : 1;
+
+    unreadMessages.value.set(message.chatId, {
+      count: newCount,
+      lastMessage: message,
+    });
+  };
+
+  const hasUnreadMessages = (chatId: string): boolean => {
+    return getUnreadCount(chatId) > 0;
+  };
+
+  const getUnreadCount = (chatId: string): number => {
+    return unreadMessages.value.get(chatId)?.count || 0;
+  };
+
+  const getTotalUnreadCount = (): number => {
+    let total = 0;
+    unreadMessages.value.forEach((chat) => {
+      total += chat.count;
+    });
+    return total;
   };
 
   // const joinSpecificChat = (chatId: string) => {
@@ -45,10 +75,27 @@ export const useChatComposable = () => {
   //   }
   // }
 
+  // const getLastMessageText = (chatId: string) => {
+  //   const unread = unreadMessages.value.get(chatId);
+
+  //   if (unread?.lastMessage?.text) {
+  //     return unread.lastMessage.text;
+  //   }
+  // };
+
+  // QUANDO MANDA MENSAGEM, ELE ATUALIZA O LASTMESSAGETEXT DO CHAT NA LISTAGEM
+  // E SOBE PARA CONVERSAS MAIS RECENTES
+
   return {
     activeChat: readonly(activeChat),
     setActiveChat,
     clearActiveChat,
     joinUserChats,
+    unreadMessages,
+    addUnreadMessage,
+    hasUnreadMessages,
+    getUnreadCount,
+    getTotalUnreadCount,
+    // getLastMessageText,
   };
 };

@@ -65,10 +65,16 @@ export default defineEventHandler(async (event) => {
       lastMessageTimestamp: new Date(),
     });
 
+    const chat = await chatRepository.findChatById(chatId);
+
     const io = getSocketIO();
     if (io) {
       io.to(`chat-${chatId}`).emit("new-message", {
         ...createdMessage,
+      });
+
+      io.to(`chat-${chatId}`).emit("update-chat", {
+        ...chat,
       });
     }
 

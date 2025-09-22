@@ -69,7 +69,7 @@ export class ChatRepository {
   }
 
   // Não está em uso no momento, mas pode ser útil para o futuro
-  async findChatById(chatId: string): Promise<IChat | null> {
+  async findChatById(chatId: string): Promise<IChatPopulated | null> {
     const chat = await Chat.findById(chatId)
       .populate<{ participants: IUser[] }>({
         path: "participants",
@@ -83,7 +83,7 @@ export class ChatRepository {
         path: "lastMessageSender",
         select: "fullName",
       })
-      .lean<IChat>()
+      .lean<IChatPopulated>()
       .exec();
 
     return chat;

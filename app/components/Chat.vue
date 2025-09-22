@@ -255,14 +255,25 @@ onMounted(() => {
 });
 
 const { socket } = useSocketComposable();
+const { addUnreadMessage } = useChatComposable();
 
 onMounted(() => {
   if (socket) {
-    socket.on("new-message", (message) => {
-      if (message.chatId !== chatId.value) return;
+    socket.off("new-message");
 
-      messages.value.push(message);
+    socket.on("new-message", (message) => {
+      if (message.chatId === chatId.value) {
+        messages.value.push(message);
+      } else {
+        addUnreadMessage(message);
+      }
     });
+  }
+});
+
+onUnmounted(() => {
+  if (socket) {
+    socket.off("new-message");
   }
 });
 </script>

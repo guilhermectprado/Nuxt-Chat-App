@@ -53,15 +53,28 @@
             size="2xl"
           />
 
-          <div class="mb-1">
-            <h1 class="font-medium">
-              {{
-                chat.isGroup
-                  ? chat.groupRef?.name || "Grupo sem nome."
-                  : chat.participants[0]?.fullName || "Usuário sem nome."
-              }}
-            </h1>
-            <p class="text-sm text-muted">{{ chat.lastMessageText }}</p>
+          <div class="w-full flex justify-between items-center">
+            <div class="mb-1">
+              <h1 class="font-medium">
+                {{
+                  chat.isGroup
+                    ? chat.groupRef?.name || "Grupo sem nome."
+                    : chat.participants[0]?.fullName || "Usuário sem nome."
+                }}
+              </h1>
+              <p class="text-sm text-muted">
+                {{ getMessageText(chat) }}
+              </p>
+            </div>
+
+            <div v-if="chat._id !== activeChat?._id">
+              <span
+                v-if="hasUnreadMessages(chat._id)"
+                class="bg-primary-600 text-white text-xs font-medium px-2 py-1 rounded-full"
+              >
+                {{ getUnreadCount(chat._id) }}
+              </span>
+            </div>
           </div>
         </li>
       </ul>
@@ -79,7 +92,14 @@ import type { IChat, IChatListResponse } from "~/types/chat.type";
 
 const emit = defineEmits(["toggleList"]);
 
-const { setActiveChat, activeChat } = useChatComposable();
+const {
+  setActiveChat,
+  activeChat,
+  joinUserChats,
+  hasUnreadMessages,
+  getUnreadCount,
+  // getLastMessageText,
+} = useChatComposable();
 
 const { data, status, error, refresh } = await useFetch<IChatListResponse>(
   "/api/chats/list",
@@ -137,7 +157,10 @@ const openChat = (friend: any) => {
   setActiveChat(friend);
 };
 
-const { joinUserChats } = useChatComposable();
+const getMessageText = (chat: IChat) => {
+  // return getLastMessageText(chat._id) || chat.lastMessageText;
+  return chat.lastMessageText;
+};
 
 watch(
   () => data,
@@ -149,6 +172,39 @@ watch(
   },
   { immediate: true }
 );
+
+const { socket } = useSocketComposable();
+const {} = useChatComposable();
+
+onMounted(() => {
+  if (socket) {
+    socket.off("update-chat");
+
+    socket.on("update-chat", (chat) => {
+      if (data.value) {
+        // console.log(data.value.chats);
+
+        const teste = data.value.chats.filter((c) => c._id !== chat._id);
+        console.log(chat);
+        console.log(teste);
+
+        // data.value.chats = data.value.chats.map((chat) => {
+        //   if (chat._id === chat._id) {
+        //     chat = chat;
+        //   }
+
+        // return chat;
+        // });
+      }
+    });
+  }
+});
+
+onUnmounted(() => {
+  if (socket) {
+    socket.off("update-chat");
+  }
+});
 </script>
 
 <style scoped></style>
