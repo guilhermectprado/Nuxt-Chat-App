@@ -68,8 +68,8 @@
 
         <div
           v-else
-          ref="chatBox"
           class="h-full overflow-y-auto custom-scrollbar"
+          ref="chatBox"
         >
           <template v-for="(group, date) in groupedMessages" :key="date">
             <div class="flex justify-center my-4">
@@ -131,6 +131,7 @@ const { activeChat } = useChatComposable();
 const userStore = useUserStore();
 
 const chatBox = useTemplateRef("chatBox");
+// const chatBox = ref<string>(null);
 const chatId = ref(activeChat.value?._id);
 const messages = ref<IMessage[]>([]);
 
@@ -154,14 +155,6 @@ const groupedMessages = computed(() => {
   return groups;
 });
 
-const scrollToBottom = () => {
-  nextTick(() => {
-    if (chatBox.value) {
-      chatBox.value.scrollTop = chatBox.value.scrollHeight;
-    }
-  });
-};
-
 const { data, status, error } = useAsyncData(
   () => `messages-${chatId.value}`,
   async () => {
@@ -180,6 +173,14 @@ const { data, status, error } = useAsyncData(
   }
 );
 
+const scrollToBottom = () => {
+  nextTick(() => {
+    if (chatBox.value) {
+      chatBox.value.scrollTop = chatBox.value.scrollHeight;
+    }
+  });
+};
+
 watch(
   () => activeChat.value?._id,
   (newId) => {
@@ -192,6 +193,7 @@ watch(
   (newData) => {
     if (newData?.success && newData?.data) {
       messages.value = [...newData.data];
+      scrollToBottom();
     }
   },
   { immediate: true }
@@ -213,9 +215,19 @@ onMounted(() => {
   if (socket) {
     socket.off("new-message");
 
-    socket.on("new-message", (message) => {
+    socket.on("new-message", async (message) => {
       if (message.chatId === chatId.value) {
-        messages.value.push(message);
+        messages.value = [...messages.value, message];
+
+        if (message.image) {
+          await nextTick();
+
+          const img = new Image();
+          img.onload = () => {
+            scrollToBottom();
+          };
+          img.src = message.image;
+        }
       } else {
         addUnreadMessage(message);
       }
