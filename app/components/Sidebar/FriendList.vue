@@ -63,7 +63,7 @@
 <script setup lang="ts">
 import type { IUser } from "~/types/user.type";
 import type { IFriendshipListResponse } from "~/types/friendship.type";
-import { FriendSearchUser } from "#components";
+import { SidebarSearchUser } from "#components";
 import type { IChat, IChatSingleResponse } from "~/types/chat.type";
 
 const emit = defineEmits(["toggleList"]);
@@ -95,7 +95,7 @@ const filteredFriends = computed(() => {
 const openSearchUsers = async () => {
   const overlay = useOverlay();
 
-  const modal = overlay.create(FriendSearchUser);
+  const modal = overlay.create(SidebarSearchUser);
 
   modal.open();
 };

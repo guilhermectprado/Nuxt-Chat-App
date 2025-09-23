@@ -91,7 +91,21 @@
                     : 'bg-sky-800  self-start text-white'
                 "
               >
-                <p class="mb-2">
+                <NuxtImg
+                  v-if="message.image"
+                  :src="message.image"
+                  alt="Imagem enviada"
+                  class="w-full h-auto cursor-pointer hover:opacity-90 transition-opacity rounded mb-1"
+                  :sizes="'(max-width: 600px) 100vw, 300px'"
+                  style="
+                    aspect-ratio: auto;
+                    max-height: 300px;
+                    object-fit: cover;
+                  "
+                />
+                <!-- @click="openImageModal(message.image)" -->
+
+                <p>
                   {{ message.text }}
                 </p>
 
@@ -104,40 +118,14 @@
         </div>
       </main>
 
-      <footer
-        class="flex gap-2 items-end bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 p-4 rounded-b"
-      >
-        <UTextarea
-          v-model="messageInput"
-          :rows="1"
-          :maxrows="4"
-          autoresize
-          class="flex-1"
-          placeholder="Digite sua mensagem..."
-          @keydown.enter.prevent="sendMessage"
-        />
-        <UButton
-          icon="lucide:send"
-          @click="sendMessage"
-          :disabled="!messageInput.trim()"
-        />
-      </footer>
+      <ChatInput />
     </div>
   </section>
 </template>
 
 <script setup lang="ts">
 import { useUserStore } from "~/store/useUserStore";
-import type {
-  IMessage,
-  IMessageGetResponse,
-  IMessagePostResponse,
-} from "~/types/message.type";
-
-interface IBody {
-  image?: string;
-  text?: string;
-}
+import type { IMessage, IMessageGetResponse } from "~/types/message.type";
 
 const { activeChat } = useChatComposable();
 const userStore = useUserStore();
@@ -145,8 +133,6 @@ const userStore = useUserStore();
 const chatBox = useTemplateRef("chatBox");
 const chatId = ref(activeChat.value?._id);
 const messages = ref<IMessage[]>([]);
-const messageInput = ref<string>("");
-const image = ref<string>("");
 
 const currentUserId = computed(() => {
   return userStore.user?._id || "";
@@ -176,36 +162,6 @@ const scrollToBottom = () => {
   });
 };
 
-const sendMessage = async () => {
-  if (!messageInput.value.trim() && !image.value.trim()) return;
-
-  try {
-    let body: IBody = {};
-
-    if (image.value) body.image = image.value;
-    if (messageInput.value) body.text = messageInput.value;
-
-    const response = await $fetch<IMessagePostResponse>(
-      `/api/messages/${chatId.value}/send`,
-      {
-        method: "POST",
-        body: body,
-      }
-    );
-
-    if (!response.success) throw response;
-
-    messageInput.value = "";
-    image.value = "";
-
-    scrollToBottom();
-  } catch (error: any) {
-    console.log(
-      `${error.status || "Erro"} - ${error.message || "Erro desconhecido"}`
-    );
-  }
-};
-
 const { data, status, error } = useAsyncData(
   () => `messages-${chatId.value}`,
   async () => {
@@ -225,6 +181,23 @@ const { data, status, error } = useAsyncData(
 );
 
 watch(
+  () => activeChat.value?._id,
+  (newId) => {
+    chatId.value = newId;
+  }
+);
+
+watch(
+  data,
+  (newData) => {
+    if (newData?.success && newData?.data) {
+      messages.value = [...newData.data];
+    }
+  },
+  { immediate: true }
+);
+
+watch(
   messages,
   () => {
     scrollToBottom();
@@ -232,28 +205,7 @@ watch(
   { deep: true }
 );
 
-watch(
-  data,
-  (newData) => {
-    if (newData?.success && newData?.data) {
-      messages.value = newData.data;
-      scrollToBottom();
-    }
-  },
-  { immediate: true }
-);
-
-watch(
-  () => activeChat.value?._id,
-  (newId) => {
-    chatId.value = newId;
-  }
-);
-
-onMounted(() => {
-  scrollToBottom();
-});
-
+///////////////////////////////
 const { socket } = useSocketComposable();
 const { addUnreadMessage } = useChatComposable();
 

@@ -25,12 +25,12 @@
     </header>
 
     <main class="flex-1">
-      <ChatList
+      <SidebarChatList
         v-show="showComponent === 'chatsList'"
         @toggleList="toggleList"
       />
 
-      <FriendList
+      <SidebarFriendList
         v-show="showComponent === 'friendsList'"
         @toggleList="toggleList"
       />

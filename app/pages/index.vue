@@ -4,7 +4,7 @@
       class="w-full h-full max-w-7xl grid grid-cols-2 rounded border border-indigo-400"
     >
       <SidebarRoot />
-      <Chat />
+      <ChatRoot />
     </div>
   </div>
 </template>
