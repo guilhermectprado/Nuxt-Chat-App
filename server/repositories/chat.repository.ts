@@ -49,7 +49,7 @@ export class ChatRepository {
     return chats;
   }
 
-  // Para chats privados entre dois usuários
+  // Para validar existencia de chats privados entre dois usuários
   async findChatBetweenUsers(
     userId1: string,
     userId2: string
@@ -68,7 +68,6 @@ export class ChatRepository {
     return chat;
   }
 
-  // Não está em uso no momento, mas pode ser útil para o futuro
   async findChatById(chatId: string): Promise<IChatPopulated | null> {
     const chat = await Chat.findById(chatId)
       .populate<{ participants: IUser[] }>({

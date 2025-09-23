@@ -29,8 +29,10 @@
         </li>
       </ul>
 
-      <ul v-else-if="data" class="flex flex-col gap-1">
-        <p v-if="data.count === 0">Nenhum chat foi criado até o momento.</p>
+      <ul v-else-if="fetchedData" class="flex flex-col gap-1">
+        <p v-if="fetchedData.count === 0">
+          Nenhum chat foi criado até o momento.
+        </p>
 
         <li
           v-else
@@ -63,7 +65,7 @@
                 }}
               </h1>
               <p class="text-sm text-muted">
-                {{ getMessageText(chat) }}
+                {{ chat.lastMessageText }}
               </p>
             </div>
 
@@ -98,15 +100,16 @@ const {
   joinUserChats,
   hasUnreadMessages,
   getUnreadCount,
-  // getLastMessageText,
 } = useChatComposable();
 
-const { data, status, error, refresh } = await useFetch<IChatListResponse>(
-  "/api/chats/list",
-  {
-    key: "chats",
-  }
-);
+const {
+  data: fetchedData,
+  status,
+  error,
+  refresh,
+} = await useFetch<IChatListResponse>("/api/chats/list", {
+  key: "chats",
+});
 
 const items = ref<TabsItem[]>([
   {
@@ -123,11 +126,12 @@ const items = ref<TabsItem[]>([
   },
 ]);
 
+const listChats = ref<IChat[]>([]);
 const typeChats = ref<string>("");
 const search = ref<string>("");
 
 const filteredChats = computed(() => {
-  let chats = data.value?.chats || [];
+  let chats = listChats.value;
 
   chats = filterByName(chats, search.value);
   chats = filterByType(chats, typeChats.value);
@@ -157,15 +161,11 @@ const openChat = (friend: any) => {
   setActiveChat(friend);
 };
 
-const getMessageText = (chat: IChat) => {
-  // return getLastMessageText(chat._id) || chat.lastMessageText;
-  return chat.lastMessageText;
-};
-
 watch(
-  () => data,
+  () => fetchedData,
   (newValue) => {
     if (newValue.value) {
+      listChats.value = newValue.value.chats;
       const chatIds = newValue.value.chats.map((chat) => chat._id);
       joinUserChats(chatIds);
     }
@@ -180,22 +180,14 @@ onMounted(() => {
   if (socket) {
     socket.off("update-chat");
 
-    socket.on("update-chat", (chat) => {
-      if (data.value) {
-        // console.log(data.value.chats);
+    socket.on("update-chat", (updatedChat) => {
+      const chat = listChats.value.find((chat) => chat._id === updatedChat._id);
 
-        const teste = data.value.chats.filter((c) => c._id !== chat._id);
-        console.log(chat);
-        console.log(teste);
+      if (!chat) return;
 
-        // data.value.chats = data.value.chats.map((chat) => {
-        //   if (chat._id === chat._id) {
-        //     chat = chat;
-        //   }
-
-        // return chat;
-        // });
-      }
+      chat.lastMessageSender = updatedChat.lastMessageSender;
+      chat.lastMessageText = updatedChat.lastMessageText;
+      chat.lastMessageTimestamp = updatedChat.lastMessageTimestamp;
     });
   }
 });

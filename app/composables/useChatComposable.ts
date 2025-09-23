@@ -75,14 +75,6 @@ export const useChatComposable = () => {
   //   }
   // }
 
-  // const getLastMessageText = (chatId: string) => {
-  //   const unread = unreadMessages.value.get(chatId);
-
-  //   if (unread?.lastMessage?.text) {
-  //     return unread.lastMessage.text;
-  //   }
-  // };
-
   // QUANDO MANDA MENSAGEM, ELE ATUALIZA O LASTMESSAGETEXT DO CHAT NA LISTAGEM
   // E SOBE PARA CONVERSAS MAIS RECENTES
 
@@ -91,11 +83,9 @@ export const useChatComposable = () => {
     setActiveChat,
     clearActiveChat,
     joinUserChats,
-    unreadMessages,
     addUnreadMessage,
     hasUnreadMessages,
     getUnreadCount,
     getTotalUnreadCount,
-    // getLastMessageText,
   };
 };
