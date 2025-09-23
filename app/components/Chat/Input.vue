@@ -23,7 +23,8 @@
     <UButton
       icon="lucide:send"
       @click="sendMessage"
-      :disabled="!messageInput.trim()"
+      :disabled="isDisabled"
+      :loading="isLoading"
     />
   </footer>
 </template>
@@ -69,10 +70,17 @@ const handleImage = async (file: File | null | undefined) => {
   reader.readAsDataURL(file);
 };
 
+const isLoading = ref<boolean>(false);
+
+const isDisabled = computed(() => {
+  return isLoading.value || (!messageInput.value.trim() && !imageBase64.value);
+});
+
 const sendMessage = async () => {
-  if (!messageInput.value.trim() && !imageBase64.value.trim()) return;
+  if (isDisabled.value) return;
 
   try {
+    isLoading.value = true;
     let body: IBody = {};
 
     if (messageInput.value) body.text = messageInput.value;
@@ -95,6 +103,8 @@ const sendMessage = async () => {
     console.log(
       `${error.status || "Erro"} - ${error.message || "Erro desconhecido"}`
     );
+  } finally {
+    isLoading.value = false;
   }
 };
 </script>
