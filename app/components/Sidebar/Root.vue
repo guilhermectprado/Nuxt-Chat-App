@@ -16,19 +16,27 @@
         </div>
       </div>
 
-      <UButton
-        icon="lucide:settings-2"
-        label="Configurações"
-        variant="ghost"
-        color="neutral"
-      />
+      <div class="flex gap-4">
+        <UButton
+          :icon="
+            showComponent === 'friendsList'
+              ? 'lucide:arrow-big-left'
+              : 'lucide:message-square-plus'
+          "
+          variant="ghost"
+          color="neutral"
+          @click="
+            showComponent === 'friendsList'
+              ? toggleList('chatsList')
+              : toggleList('friendsList')
+          "
+        />
+        <!-- <UButton icon="lucide:settings-2" variant="ghost" color="neutral" /> -->
+      </div>
     </header>
 
     <main class="flex-1">
-      <SidebarChatList
-        v-show="showComponent === 'chatsList'"
-        @toggleList="toggleList"
-      />
+      <SidebarChatList v-show="showComponent === 'chatsList'" />
 
       <SidebarFriendList
         v-show="showComponent === 'friendsList'"

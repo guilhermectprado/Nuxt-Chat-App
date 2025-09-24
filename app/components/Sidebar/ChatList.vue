@@ -1,14 +1,19 @@
 <template>
   <section class="space-y-4">
     <header class="flex justify-between gap-4 items-center">
-      <UInput v-model="search" icon="lucide:user-search" class="w-full" />
+      <UInput
+        v-model="search"
+        icon="lucide:user-search"
+        class="w-full"
+        placeholder="Buscar chat..."
+      />
 
-      <UButton
+      <!-- <UButton
         icon="lucide:users"
         label="Amigos"
         variant="ghost"
         @click="emit('toggleList', 'friendsList')"
-      />
+      /> -->
     </header>
 
     <main class="space-y-4">
@@ -65,7 +70,7 @@
                 }}
               </h1>
               <p class="text-sm text-muted">
-                {{ chat.lastMessageText }}
+                {{ chat.lastMessageText || "Sem mensagens ainda..." }}
               </p>
             </div>
 
@@ -91,8 +96,6 @@
 <script setup lang="ts">
 import type { TabsItem } from "@nuxt/ui";
 import type { IChat, IChatListResponse } from "~/types/chat.type";
-
-const emit = defineEmits(["toggleList"]);
 
 const {
   setActiveChat,

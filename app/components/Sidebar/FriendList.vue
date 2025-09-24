@@ -1,21 +1,33 @@
 <template>
   <section class="space-y-4">
-    <header class="flex justify-between gap-4 items-center">
-      <UButton
-        icon="lucide:move-left"
-        label="Voltar"
-        variant="ghost"
-        @click="emit('toggleList', 'chatsList')"
-      />
+    <header class="flex flex-col justify-between gap-3 items-center">
+      <div class="w-full flex gap-4">
+        <UInput
+          v-model="search"
+          icon="lucide:user-search"
+          class="w-full"
+          placeholder="Buscar amigos..."
+        />
+      </div>
 
-      <UInput v-model="search" icon="lucide:user-search" class="w-full" />
+      <div class="flex gap-4 w-full">
+        <UButton
+          icon="lucide:user-round-plus"
+          label="Novo Contato"
+          variant="subtle"
+          @click="openSearchUsers"
+          class="flex-1 justify-center"
+        />
+        <UButton
+          icon="lucide:users-round"
+          label="Novo Grupo"
+          variant="subtle"
+          @click="openCreateGroup"
+          class="flex-1 justify-center"
+        />
+      </div>
 
-      <UButton
-        icon="lucide:user-round-plus"
-        label="Adicionar"
-        variant="ghost"
-        @click="openSearchUsers"
-      />
+      <USeparator />
     </header>
 
     <main class="space-y-4">
@@ -41,9 +53,6 @@
           <UAvatar
             :src="friend.profileImage ? friend.profileImage : '/image.png'"
             size="2xl"
-            :chip="{
-              color: friend.isOnline ? 'primary' : 'neutral',
-            }"
           />
 
           <div class="mb-1">
@@ -63,7 +72,7 @@
 <script setup lang="ts">
 import type { IUser } from "~/types/user.type";
 import type { IFriendshipListResponse } from "~/types/friendship.type";
-import { SidebarSearchUser } from "#components";
+import { SidebarCreateGroup, SidebarSearchUser } from "#components";
 import type { IChat, IChatSingleResponse } from "~/types/chat.type";
 
 const emit = defineEmits(["toggleList"]);
@@ -96,6 +105,14 @@ const openSearchUsers = async () => {
   const overlay = useOverlay();
 
   const modal = overlay.create(SidebarSearchUser);
+
+  modal.open();
+};
+
+const openCreateGroup = async () => {
+  const overlay = useOverlay();
+
+  const modal = overlay.create(SidebarCreateGroup);
 
   modal.open();
 };
