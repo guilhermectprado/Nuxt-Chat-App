@@ -1,6 +1,6 @@
 <template>
   <footer
-    class="flex gap-2 items-end border-t border-gray-200 dark:border-gray-700 p-4 rounded-b"
+    class="flex gap-2 items-end border-t border-neutral-700 p-4 rounded-b"
   >
     <div class="flex flex-1 gap-2 items-end">
       <UFileUpload

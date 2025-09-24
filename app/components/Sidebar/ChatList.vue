@@ -1,6 +1,6 @@
 <template>
-  <section class="space-y-4">
-    <header class="flex justify-between gap-4 items-center">
+  <section class="space-y-3">
+    <header class="flex flex-col gap-3">
       <UInput
         v-model="search"
         icon="lucide:user-search"
@@ -8,28 +8,25 @@
         placeholder="Buscar chat..."
       />
 
-      <!-- <UButton
-        icon="lucide:users"
-        label="Amigos"
-        variant="ghost"
-        @click="emit('toggleList', 'friendsList')"
-      /> -->
-    </header>
-
-    <main class="space-y-4">
       <UTabs
         v-model="typeChats"
         color="neutral"
         variant="link"
         :content="false"
         :items="items"
+        class="flex-1 mb-[5px]"
       />
+    </header>
 
+    <main>
       <ul v-if="status === 'pending'" class="flex flex-col gap-1">
         <li v-for="index in 5" :key="index">
-          <div class="flex items-center gap-2 p-4 rounded">
-            <USkeleton class="size-12 rounded-full" />
-            <USkeleton class="flex-1 h-12" />
+          <div class="flex items-center gap-4">
+            <USkeleton class="h-12 w-12 rounded-full" />
+            <div class="grid gap-2">
+              <USkeleton class="h-4 flex-1" />
+              <USkeleton class="h-4 flex-1" />
+            </div>
           </div>
         </li>
       </ul>
@@ -46,42 +43,33 @@
           class="flex items-center gap-2 p-4 rounded cursor-pointer"
           @click="openChat(chat)"
           :class="{
-            'bg-primary-100 dark:bg-gray-700': activeChat?._id === chat._id,
-            'hover:bg-gray-100 dark:hover:bg-gray-800':
-              activeChat?._id !== chat._id,
+            'bg-neutral-700': activeChat?._id === chat._id,
+            'hover:bg-neutral-800': activeChat?._id !== chat._id,
           }"
         >
-          <UAvatar
-            :src="
+          <UUser
+            :name="
               chat.isGroup
-                ? chat.groupRef?.image || '/image.png'
-                : chat.participants[0]?.profileImage || '/image.png'
+                ? chat.groupRef?.name || 'Grupo sem nome.'
+                : chat.participants[0]?.fullName || 'Usuário sem nome.'
             "
-            size="2xl"
+            :description="chat.lastMessageText || 'Sem mensagens ainda...'"
+            :avatar="{
+              src: chat.isGroup
+                ? chat.groupRef?.image || ''
+                : chat.participants[0]?.profileImage || '',
+              icon: 'i-lucide-image',
+            }"
+            size="xl"
           />
 
-          <div class="w-full flex justify-between items-center">
-            <div class="mb-1">
-              <h1 class="font-medium">
-                {{
-                  chat.isGroup
-                    ? chat.groupRef?.name || "Grupo sem nome."
-                    : chat.participants[0]?.fullName || "Usuário sem nome."
-                }}
-              </h1>
-              <p class="text-sm text-muted">
-                {{ chat.lastMessageText || "Sem mensagens ainda..." }}
-              </p>
-            </div>
-
-            <div v-if="chat._id !== activeChat?._id">
-              <span
-                v-if="hasUnreadMessages(chat._id)"
-                class="bg-primary-600 text-white text-xs font-medium px-2 py-1 rounded-full"
-              >
-                {{ getUnreadCount(chat._id) }}
-              </span>
-            </div>
+          <div v-if="chat._id !== activeChat?._id">
+            <span
+              v-if="hasUnreadMessages(chat._id)"
+              class="bg-primary-600 text-white text-xs font-medium px-2 py-1 rounded-full"
+            >
+              {{ getUnreadCount(chat._id) }}
+            </span>
           </div>
         </li>
       </ul>

@@ -18,7 +18,7 @@
           />
           <USelectMenu
             v-model="selectedUsers"
-            :items="items"
+            :items="listFriendsToSelect"
             class="flex-1"
             multiple
             size="lg"
@@ -36,6 +36,8 @@
 </template>
 
 <script setup lang="ts">
+import type { IFriendshipListResponse } from "~/types/friendship.type";
+
 interface UserItem {
   label: string;
   value: string;
@@ -45,40 +47,7 @@ interface UserItem {
   };
 }
 
-const items = ref<UserItem[]>([
-  {
-    label: "benjamincanac",
-    value: "benjamincanac",
-    avatar: {
-      src: "https://github.com/benjamincanac.png",
-      alt: "benjamincanac",
-    },
-  },
-  {
-    label: "romhml",
-    value: "romhml",
-    avatar: {
-      src: "https://github.com/romhml.png",
-      alt: "romhml",
-    },
-  },
-  {
-    label: "noook",
-    value: "noook",
-    avatar: {
-      src: "https://github.com/noook.png",
-      alt: "noook",
-    },
-  },
-  {
-    label: "sandros94",
-    value: "sandros94",
-    avatar: {
-      src: "https://github.com/sandros94.png",
-      alt: "sandros94",
-    },
-  },
-]);
+const listFriendsToSelect = ref<UserItem[]>([]);
 
 const imagePreview = ref<File | null>(null);
 const imageBase64 = ref<string>("");
@@ -108,4 +77,30 @@ const handleImage = async (file: File | null | undefined) => {
 
   reader.readAsDataURL(file);
 };
+
+const {
+  data: friends,
+  status,
+  error,
+  refresh,
+} = await useFetch<IFriendshipListResponse>("/api/friendship/list", {
+  key: "friends",
+});
+
+watch(
+  () => friends,
+  (newStatus) => {
+    if (newStatus.value) {
+      listFriendsToSelect.value = newStatus.value.friends.map((friend) => ({
+        label: friend.fullName,
+        value: friend._id,
+        avatar: {
+          src: friend.profileImage,
+          alt: friend.fullName,
+        },
+      }));
+    }
+  },
+  { immediate: true }
+);
 </script>

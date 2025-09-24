@@ -1,16 +1,14 @@
 <template>
-  <section class="space-y-4">
-    <header class="flex flex-col justify-between gap-3 items-center">
-      <div class="w-full flex gap-4">
-        <UInput
-          v-model="search"
-          icon="lucide:user-search"
-          class="w-full"
-          placeholder="Buscar amigos..."
-        />
-      </div>
+  <section class="space-y-3">
+    <header class="flex flex-col gap-3">
+      <UInput
+        v-model="search"
+        icon="lucide:user-search"
+        class="w-full"
+        placeholder="Buscar amigos..."
+      />
 
-      <div class="flex gap-4 w-full">
+      <div class="flex gap-3 w-full">
         <UButton
           icon="lucide:user-round-plus"
           label="Novo Contato"
@@ -30,12 +28,15 @@
       <USeparator />
     </header>
 
-    <main class="space-y-4">
+    <main>
       <ul v-if="status === 'pending'" class="flex flex-col gap-1">
         <li v-for="index in 5" :key="index">
-          <div class="flex items-center gap-2 p-4 rounded">
-            <USkeleton class="size-12 rounded-full" />
-            <USkeleton class="flex-1 h-12" />
+          <div class="flex items-center gap-4">
+            <USkeleton class="h-12 w-12 rounded-full" />
+            <div class="grid gap-2">
+              <USkeleton class="h-4 flex-1" />
+              <USkeleton class="h-4 flex-1" />
+            </div>
           </div>
         </li>
       </ul>
@@ -48,17 +49,17 @@
           v-for="(friend, index) in filteredFriends"
           :key="index"
           @click="createChat(friend)"
-          class="flex items-center gap-2 p-4 rounded hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
+          class="flex items-center gap-2 p-4 rounded hover:bg-neutral-800 cursor-pointer"
         >
-          <UAvatar
-            :src="friend.profileImage ? friend.profileImage : '/image.png'"
-            size="2xl"
+          <UUser
+            :name="friend.fullName"
+            :description="friend.username"
+            :avatar="{
+              src: friend.profileImage,
+              icon: 'i-lucide-image',
+            }"
+            size="xl"
           />
-
-          <div class="mb-1">
-            <h1 class="font-medium">{{ friend.fullName }}</h1>
-            <p class="text-sm text-muted">{{ friend.username }}</p>
-          </div>
         </li>
       </ul>
 

@@ -8,42 +8,37 @@
           class="w-full"
         />
 
-        <ul v-if="loading" class="flex flex-col gap-4">
+        <ul v-if="loading" class="flex flex-col gap-1">
           <li v-for="index in 5" :key="index">
             <div class="flex items-center gap-4">
               <USkeleton class="h-12 w-12 rounded-full" />
               <div class="grid gap-2">
-                <USkeleton class="h-4 w-[250px]" />
-                <USkeleton class="h-4 w-[200px]" />
+                <USkeleton class="h-4 flex-1" />
+                <USkeleton class="h-4 flex-1" />
               </div>
             </div>
           </li>
         </ul>
 
-        <ul v-else-if="data" class="flex flex-col gap-4">
+        <ul v-else-if="data" class="flex flex-col gap-1">
           <p v-if="data.count === 0">Nenhum usuário encontrado.</p>
 
           <li
             v-else
             v-for="(searchedUser, index) in data.users"
             :key="index"
-            class=""
+            class="p-4 rounded hover:bg-neutral-800"
           >
-            <div class="flex items-center justify-between gap-2">
-              <div class="flex items-center gap-2">
-                <UAvatar
-                  :src="
-                    searchedUser.profileImage
-                      ? searchedUser.profileImage
-                      : '/image.png'
-                  "
-                  size="2xl"
-                />
-                <div class="mb-1">
-                  <h1 class="font-medium">{{ searchedUser.fullName }}</h1>
-                  <p class="text-sm text-muted">{{ searchedUser.username }}</p>
-                </div>
-              </div>
+            <div class="flex items-center justify-between gap-1">
+              <UUser
+                :name="searchedUser.fullName"
+                :description="searchedUser.username"
+                :avatar="{
+                  src: searchedUser.profileImage,
+                  icon: 'i-lucide-image',
+                }"
+                size="xl"
+              />
 
               <div>
                 <UButton

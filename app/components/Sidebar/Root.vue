@@ -4,19 +4,20 @@
   >
     <header class="flex items-center justify-between">
       <div class="flex gap-1 items-center">
-        <UAvatar src="/image.png" size="2xl" />
-
-        <div class="flex flex-col">
-          <div class="font-medium">
-            {{ userStore.user?.fullName }}
-          </div>
-          <div class="text-muted text-xs">
-            {{ userStore.user?.username }}
-          </div>
-        </div>
+        <UUser
+          :name="userStore.user?.fullName"
+          :description="userStore.user?.username"
+          :avatar="{
+            src: userStore.user?.profileImage,
+            icon: 'i-lucide-image',
+          }"
+          size="xl"
+        />
       </div>
 
       <div class="flex gap-4">
+        <UColorModeButton />
+
         <UButton
           :icon="
             showComponent === 'friendsList'

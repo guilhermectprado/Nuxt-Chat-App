@@ -12,9 +12,7 @@
     </div>
 
     <div v-else class="flex flex-col h-full overflow-hidden">
-      <header
-        class="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 p-4 rounded-t flex-shrink-0"
-      >
+      <header class="border-b border-neutral-700 p-4 rounded-t flex-shrink-0">
         <div class="flex items-center gap-3">
           <UAvatar
             :src="activeChat.participants[0]?.profileImage || '/image.png'"
@@ -74,7 +72,7 @@
           <template v-for="(group, date) in groupedMessages" :key="date">
             <div class="flex justify-center my-4">
               <div
-                class="bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-full text-sm text-gray-600 dark:text-gray-300"
+                class="bg-neutral-800 px-3 py-1 rounded-full text-sm text-neutral-300"
               >
                 {{ formatDateChip(date) }}
               </div>
