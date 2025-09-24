@@ -40,7 +40,7 @@
           v-else
           v-for="(chat, index) in filteredChats"
           :key="index"
-          class="flex items-center gap-2 p-4 rounded cursor-pointer"
+          class="flex items-center justify-between gap- p-4 rounded cursor-pointer"
           @click="openChat(chat)"
           :class="{
             'bg-neutral-700': activeChat?._id === chat._id,
@@ -50,27 +50,20 @@
           <UUser
             :name="
               chat.isGroup
-                ? chat.groupRef?.name || 'Grupo sem nome.'
+                ? chat.name || 'Grupo sem nome.'
                 : chat.participants[0]?.fullName || 'Usuário sem nome.'
             "
             :description="chat.lastMessageText || 'Sem mensagens ainda...'"
             :avatar="{
               src: chat.isGroup
-                ? chat.groupRef?.image || ''
+                ? chat.image || ''
                 : chat.participants[0]?.profileImage || '',
               icon: 'i-lucide-image',
             }"
             size="xl"
           />
 
-          <div v-if="chat._id !== activeChat?._id">
-            <span
-              v-if="hasUnreadMessages(chat._id)"
-              class="bg-primary-600 text-white text-xs font-medium px-2 py-1 rounded-full"
-            >
-              {{ getUnreadCount(chat._id) }}
-            </span>
-          </div>
+          <UBadge>0</UBadge>
         </li>
       </ul>
 
@@ -85,13 +78,7 @@
 import type { TabsItem } from "@nuxt/ui";
 import type { IChat, IChatListResponse } from "~/types/chat.type";
 
-const {
-  setActiveChat,
-  activeChat,
-  joinUserChats,
-  hasUnreadMessages,
-  getUnreadCount,
-} = useChatComposable();
+const { setActiveChat, activeChat, joinUserChats } = useChatComposable();
 
 const {
   data: fetchedData,
@@ -165,7 +152,6 @@ watch(
 );
 
 const { socket } = useSocketComposable();
-const {} = useChatComposable();
 
 onMounted(() => {
   if (socket) {

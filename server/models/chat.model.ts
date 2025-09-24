@@ -9,19 +9,6 @@ const chatSchema = new mongoose.Schema(
         required: true,
       },
     ],
-    isGroup: {
-      type: Boolean,
-      default: false,
-    },
-    groupRef: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Group",
-    },
-    // lastMessage: {
-    //   type: mongoose.Schema.Types.ObjectId,
-    //   ref: "Message",
-    // },
-    // CAMPOS NOVOS PARA OTIMIZAÇÃO: - sugestao DeepSick
     lastMessageText: {
       type: String,
       default: "",
@@ -34,6 +21,33 @@ const chatSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
+    //
+    isGroup: {
+      type: Boolean,
+      default: false,
+    },
+    name: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    description: {
+      type: String,
+      default: "",
+    },
+    image: {
+      type: String,
+      default: "",
+    },
+    admin: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    // isPublicGroup: {
+    //   type: Boolean,
+    //   default: false,
+    // },
   },
   { timestamps: true }
 );

@@ -1,15 +1,21 @@
 import { Types, Document } from "mongoose";
 import { IUser } from "./user.type";
-import { IGroup } from "./group.type";
 
 export interface IChat extends Document {
   _id: Types.ObjectId;
   participants: Types.ObjectId[];
-  isGroup: boolean;
-  groupRef: Types.ObjectId;
+
   lastMessageText: string;
   lastMessageTimestamp: Date;
   lastMessageSender: Types.ObjectId;
+
+  isGroup: boolean;
+  name: string;
+  description: string;
+  image: string;
+  admin: Types.ObjectId;
+  // isPublicGroup: boolean;
+
   createdAt: Date;
   updatedAt: Date;
 }
@@ -18,8 +24,7 @@ export interface IChat extends Document {
 // Omite participants, groupfRef e lastMessageSander padrão do IChat e
 // manda o objeto por completo
 export interface IChatPopulated
-  extends Omit<IChat, "participants" | "groupRef" | "lastMessageSender"> {
+  extends Omit<IChat, "participants" | "lastMessageSender"> {
   participants: IUser[];
-  groupRef?: IGroup;
   lastMessageSender?: IUser;
 }

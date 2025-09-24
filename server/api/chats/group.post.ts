@@ -1,6 +1,12 @@
 import { chatRepository } from "~~/server/repositories/chat.repository";
 import { getIdUser } from "~~/server/utils/getIdUser";
 
+interface IGroupBody {
+  name: string;
+  participants: string[];
+  image: string;
+}
+
 export default defineEventHandler(async (event) => {
   try {
     const userId = getIdUser(event);
@@ -12,23 +18,21 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    const body = await readBody(event);
-    const { friendId } = body;
+    const { participants, ...body }: IGroupBody = await readBody(event);
 
-    let chat = await chatRepository.findChatBetweenUsers(userId, friendId);
-    let isNewChat = false;
+    const aux = {
+      participants: [...participants, userId],
+      isGroup: true,
+      ...body,
+      admin: userId,
+    };
 
-    if (!chat) {
-      chat = await chatRepository.createChat({
-        participants: [userId, friendId],
-      });
-      isNewChat = true;
-    }
+    const group = await chatRepository.createChat(aux);
 
     return {
       success: true,
-      chat,
-      message: isNewChat ? "Chat criado com sucesso" : "Chat já existia",
+      group,
+      message: "Grupo criado com sucesso",
     };
   } catch (error: any) {
     if (error.statusCode && error.statusCode !== 500) {

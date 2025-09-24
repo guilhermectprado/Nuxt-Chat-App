@@ -1,22 +1,19 @@
 import type { IUser } from "./user.type";
-interface IGroup {
-  _id: string;
-  name: string;
-  description: string;
-  image?: string;
-  isPublic: boolean;
-  admin: IUser;
-  chatRef: string;
-}
 
 export interface IChat {
   _id: string;
   participants: IUser[];
-  isGroup: boolean;
-  groupRef: IGroup;
   lastMessageText: string;
   lastMessageTimestamp: Date;
   lastMessageSender: IUser;
+
+  isGroup: boolean;
+  name: string;
+  description: string;
+  image: string;
+  isPublic: boolean;
+  admin: string;
+
   createdAt: String;
   updatedAt: String;
 }

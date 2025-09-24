@@ -40,9 +40,7 @@ interface IBody {
   text?: string;
 }
 
-const chatId = ref(activeChat.value?._id);
 const messageInput = ref<string>("");
-
 const imagePreview = ref<File | null>(null);
 const imageBase64 = ref<string>("");
 
@@ -79,6 +77,7 @@ const isDisabled = computed(() => {
 const sendMessage = async () => {
   if (isDisabled.value) return;
 
+  console.log(activeChat.value?._id);
   try {
     isLoading.value = true;
     let body: IBody = {};
@@ -87,7 +86,7 @@ const sendMessage = async () => {
     if (imagePreview.value) body.image = imageBase64.value;
 
     const response = await $fetch<IMessagePostResponse>(
-      `/api/messages/${chatId.value}/send`,
+      `/api/messages/${activeChat.value?._id}/send`,
       {
         method: "POST",
         body: body,

@@ -1,16 +1,19 @@
 import Chat from "../models/chat.model";
 import { IChat, IChatPopulated } from "../types/chat.type";
-import { IGroup } from "../types/group.type";
 import { IUser } from "../types/user.type";
 
-export class ChatRepository {
-  async createChat(userId: string, friendId: string): Promise<IChat> {
-    const chatData = {
-      participants: [userId, friendId],
-      isGroup: false,
-    };
+interface IChatPost {
+  participants: string[];
+  isGroup: boolean;
+  name: string;
+  // description: string;
+  image: string;
+  admin: string;
+}
 
-    const chat = new Chat(chatData);
+export class ChatRepository {
+  async createChat(data: Partial<IChatPost>): Promise<IChat> {
+    const chat = new Chat(data);
     await chat.save();
 
     const savedChat = await Chat.findById(chat._id).lean<IChat>();
@@ -31,11 +34,6 @@ export class ChatRepository {
         path: "participants",
         match: { _id: { $ne: userId } }, // Exclui o próprio usuário
         select: "fullName username profileImage isOnline",
-      })
-      // Transforma: ID do grupo → objeto grupo completo
-      .populate<{ groupRef: IGroup }>({
-        path: "groupRef",
-        select: "name image",
       })
       // Transforma: ID do remetente → objeto usuário
       .populate<{ lastMessageSender: IUser }>({
@@ -73,10 +71,6 @@ export class ChatRepository {
       .populate<{ participants: IUser[] }>({
         path: "participants",
         select: "fullName username profileImage isOnline",
-      })
-      .populate<{ groupRef: IGroup }>({
-        path: "groupRef",
-        select: "name image",
       })
       .populate<{ lastMessageSender: IUser }>({
         path: "lastMessageSender",
