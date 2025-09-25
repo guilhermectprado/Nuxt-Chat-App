@@ -125,8 +125,8 @@ watch(
   },
   { deep: true }
 );
-
 ///////////////////////////////
+
 const { socket } = useSocketComposable();
 
 onMounted(() => {

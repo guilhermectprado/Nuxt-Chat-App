@@ -65,6 +65,8 @@ export default defineEventHandler(async (event) => {
       lastMessageTimestamp: new Date(),
     });
 
+    await chatRepository.incrementUnreadForOthers(chatId, userId);
+
     const chat = await chatRepository.findChatById(chatId);
 
     const io = getSocketIO();

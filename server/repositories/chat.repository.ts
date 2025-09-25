@@ -93,6 +93,44 @@ export class ChatRepository {
 
     return updatedChat;
   }
+
+  async incrementUnreadForOthers(chatId: string, senderId: string) {
+    const chat = await Chat.findById(chatId).lean();
+
+    if (!chat) throw new Error("Chat não encontrado");
+
+    const updateOperations: any = {};
+
+    chat.participants.forEach((participantId) => {
+      const participantIdStr = participantId.toString();
+
+      if (participantIdStr !== senderId) {
+        updateOperations[`unreadCounts.${participantIdStr}`] = 1;
+      }
+    });
+
+    const updatedChat = await Chat.findByIdAndUpdate(
+      chatId,
+      { $inc: updateOperations },
+      { new: true, lean: true }
+    );
+
+    return updatedChat;
+  }
+
+  async markChatAsRead(chatId: string, userId: string) {
+    const updatedChat = await Chat.findByIdAndUpdate(
+      chatId,
+      {
+        $set: { [`unreadCounts.${userId}`]: 0 },
+      },
+      { new: true, lean: true }
+    );
+
+    if (!updatedChat) throw new Error("Chat não encontrado");
+
+    return updatedChat;
+  }
 }
 
 export const chatRepository = new ChatRepository();

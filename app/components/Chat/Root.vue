@@ -21,6 +21,26 @@
 
 <script setup lang="ts">
 const { activeChat } = useChatComposable();
+
+const { socket } = useSocketComposable();
+
+// onMounted(() => {
+//   if (socket) {
+//     socket.off("new-message");
+
+//     socket.on("new-message", async (message) => {
+//       if (message.chatId !== activeChat.value?._id) {
+//         addUnreadMessage(message.chatId);
+//       }
+//     });
+//   }
+// });
+
+// onUnmounted(() => {
+//   if (socket) {
+//     socket.off("new-message");
+//   }
+// });
 </script>
 
 <style scoped></style>

@@ -53,10 +53,6 @@ import { useUserStore } from "~/store/useUserStore";
 
 const userStore = useUserStore();
 
-interface IMessage {
-  nome: string;
-}
-
 const props = defineProps({
   isGroup: {
     type: Boolean,

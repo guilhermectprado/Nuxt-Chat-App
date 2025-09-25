@@ -77,7 +77,6 @@ const isDisabled = computed(() => {
 const sendMessage = async () => {
   if (isDisabled.value) return;
 
-  console.log(activeChat.value?._id);
   try {
     isLoading.value = true;
     let body: IBody = {};
@@ -99,7 +98,7 @@ const sendMessage = async () => {
     imagePreview.value = null;
     imageBase64.value = "";
   } catch (error: any) {
-    console.log(
+    console.error(
       `${error.status || "Erro"} - ${error.message || "Erro desconhecido"}`
     );
   } finally {

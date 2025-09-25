@@ -15,6 +15,7 @@ export interface IChat extends Document {
   image: string;
   admin: Types.ObjectId;
   // isPublicGroup: boolean;
+  unreadCounts: Record<string, number>;
 
   createdAt: Date;
   updatedAt: Date;

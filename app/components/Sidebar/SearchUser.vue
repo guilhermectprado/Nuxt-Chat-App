@@ -152,7 +152,7 @@ const sendInviteToFriend = async (userId: string) => {
     userInvited.relation = "pending_sent";
   } catch (error: any) {
     let errorMessage = `${error.data.statusCode} - ${error.data.message}`;
-    console.log(errorMessage);
+    console.error(errorMessage);
   } finally {
     loadingInvite.value[userId] = false;
   }

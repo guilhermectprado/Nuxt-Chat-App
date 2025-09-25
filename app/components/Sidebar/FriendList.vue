@@ -131,7 +131,7 @@ const createChat = async (friend: IUser) => {
 
     openChat(response.chat, true);
   } catch (error: any) {
-    console.log(`${error.data.statusCode} - ${error.data.message}`);
+    console.error(`${error.data.statusCode} - ${error.data.message}`);
   }
 };
 

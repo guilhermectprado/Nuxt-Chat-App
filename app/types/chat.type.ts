@@ -13,6 +13,7 @@ export interface IChat {
   image: string;
   isPublic: boolean;
   admin: string;
+  unreadCounts: Record<string, number>;
 
   createdAt: String;
   updatedAt: String;

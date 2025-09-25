@@ -63,7 +63,9 @@
             size="xl"
           />
 
-          <UBadge>0</UBadge>
+          <UBadge v-if="chat.unreadCounts?.[currentUserId] || 0 > 0">
+            {{ chat.unreadCounts?.[currentUserId] }}
+          </UBadge>
         </li>
       </ul>
 
@@ -76,6 +78,7 @@
 
 <script setup lang="ts">
 import type { TabsItem } from "@nuxt/ui";
+import { useUserStore } from "~/store/useUserStore";
 import type { IChat, IChatListResponse } from "~/types/chat.type";
 
 const { setActiveChat, activeChat, joinUserChats } = useChatComposable();
@@ -152,6 +155,11 @@ watch(
 );
 
 const { socket } = useSocketComposable();
+const userStore = useUserStore();
+
+const currentUserId = computed(() => {
+  return userStore.user?._id || "";
+});
 
 onMounted(() => {
   if (socket) {
@@ -165,6 +173,7 @@ onMounted(() => {
       chat.lastMessageSender = updatedChat.lastMessageSender;
       chat.lastMessageText = updatedChat.lastMessageText;
       chat.lastMessageTimestamp = updatedChat.lastMessageTimestamp;
+      chat.unreadCounts = updatedChat.unreadCounts;
     });
   }
 });

@@ -48,6 +48,11 @@ const chatSchema = new mongoose.Schema(
     //   type: Boolean,
     //   default: false,
     // },
+    unreadCounts: {
+      type: Object,
+      default: {},
+      // Exemplo: { "user1-id": 3, "user2-id": 0 }
+    },
   },
   { timestamps: true }
 );

@@ -73,7 +73,7 @@ const logout = async () => {
     userStore.clearUser();
     navigateTo("/login");
   } catch (error: any) {
-    console.log(`${error.data.statusCode} - ${error.data.message}`);
+    console.error(`${error.data.statusCode} - ${error.data.message}`);
   }
 };
 
