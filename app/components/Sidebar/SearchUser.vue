@@ -163,7 +163,7 @@ const updateInvite = async (userId: string, status: string) => {
     loadingUpdatedInvite.value[userId] = true;
 
     const response = await $fetch("/api/friendship/update-invite", {
-      method: "PUT",
+      method: "PATCH",
       body: {
         fromUserId: userId,
         status: status,

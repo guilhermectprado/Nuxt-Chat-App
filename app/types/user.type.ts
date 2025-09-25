@@ -5,7 +5,6 @@ export interface IUser {
   fullName: string;
   username: string;
   profileImage: string;
-  groups: string[];
   isOnline: boolean;
   lastSeen: Date;
   createdAt: Date;
@@ -15,4 +14,10 @@ export interface IUser {
 export interface IUserStore {
   user: IUser | null;
   isAuthenticated: boolean;
+}
+
+export interface IUserPatchResponse {
+  success: boolean;
+  data: IUser;
+  message: string;
 }

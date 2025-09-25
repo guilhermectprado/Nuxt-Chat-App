@@ -1,5 +1,7 @@
 <template>
-  <main class="flex-1 overflow-hidden">
+  <main
+    class="flex-1 overflow-hidden bg-linear-to-t from-sky-500 to-indigo-900"
+  >
     <div
       v-if="status === 'pending'"
       class="h-full flex justify-center items-center"

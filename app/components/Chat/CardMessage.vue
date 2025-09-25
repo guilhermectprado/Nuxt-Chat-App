@@ -13,7 +13,7 @@
     />
 
     <div
-      class="max-w-2/3 flex flex-col gap-2 py-2 px-3 rounded-lg wrap-break-word transition-colors"
+      class="max-w-2/3 flex flex-col gap-2 py-2 px-3 rounded-lg wrap-break-word shadow-md"
       :class="
         message.sender._id === currentUserId
           ? 'bg-neutral-600 text-white'

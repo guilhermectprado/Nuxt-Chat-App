@@ -7,7 +7,6 @@ export interface IUser {
   fullName: string;
   username: string;
   profileImage?: string;
-  groups: Types.ObjectId[];
   isOnline: boolean;
   lastSeen: Date;
   createdAt: Date;

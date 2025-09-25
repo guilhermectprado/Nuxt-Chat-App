@@ -11,7 +11,6 @@ export const useChatComposable = () => {
     activeChat.value = chat;
 
     if (chat?._id) {
-      // unreadMessages.value.delete(chat._id);
       markChatAsRead(chat._id);
     }
   };
@@ -31,25 +30,9 @@ export const useChatComposable = () => {
     });
   };
 
-  // const unreadMessages = useState<Map<string, number>>(
-  //   "unreadMessages",
-  //   () => new Map()
-  // );
-
-  // const addUnreadMessage = (chatId: string) => {
-  //   if (chatId !== activeChat.value?._id) {
-  //     const current = unreadMessages.value.get(chatId) || 0;
-  //     unreadMessages.value.set(chatId, current + 1);
-  //   }
-  // };
-
-  // const getUnreadCount = (chatId: string): number => {
-  //   return unreadMessages.value.get(chatId) || 0;
-  // };
-
   const markChatAsRead = async (chatId: string) => {
     try {
-      await $fetch(`/api/chats/${chatId}/mark-read`, { method: "PUT" });
+      await $fetch(`/api/chats/${chatId}/mark-read`, { method: "PATCH" });
     } catch (error) {
       console.error("Erro ao marcar chat como lido:", error);
     }
@@ -72,15 +55,10 @@ export const useChatComposable = () => {
   //   }
   // }
 
-  // QUANDO MANDA MENSAGEM, ELE ATUALIZA O LASTMESSAGETEXT DO CHAT NA LISTAGEM
-  // E SOBE PARA CONVERSAS MAIS RECENTES
-
   return {
     activeChat: readonly(activeChat),
     setActiveChat,
     clearActiveChat,
     joinUserChats,
-    // addUnreadMessage,
-    // getUnreadCount,
   };
 };

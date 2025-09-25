@@ -2,38 +2,8 @@
   <aside
     class="flex flex-col justify-between p-4 gap-4 border-e border-indigo-400"
   >
-    <header class="flex items-center justify-between">
-      <div class="flex gap-1 items-center">
-        <UUser
-          :name="userStore.user?.fullName"
-          :description="userStore.user?.username"
-          :avatar="{
-            src: userStore.user?.profileImage,
-            icon: 'i-lucide-image',
-          }"
-          size="xl"
-        />
-      </div>
-
-      <div class="flex gap-4">
-        <UColorModeButton />
-
-        <UButton
-          :icon="
-            showComponent === 'friendsList'
-              ? 'lucide:arrow-big-left'
-              : 'lucide:message-square-plus'
-          "
-          variant="ghost"
-          color="neutral"
-          @click="
-            showComponent === 'friendsList'
-              ? toggleList('chatsList')
-              : toggleList('friendsList')
-          "
-        />
-        <!-- <UButton icon="lucide:settings-2" variant="ghost" color="neutral" /> -->
-      </div>
+    <header>
+      <SidebarHeader :showComponent="showComponent" @toggle="toggleList" />
     </header>
 
     <main class="flex-1">

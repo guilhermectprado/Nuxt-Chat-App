@@ -14,9 +14,14 @@ export const useUserStore = defineStore("user", {
   },
 
   actions: {
-    setUser(user: any) {
+    setUser(user: IUser) {
       this.user = user;
       this.isAuthenticated = true;
+    },
+
+    updateUser(user: IUser) {
+      this.user = user;
+      console.log(this.user);
     },
 
     clearUser() {

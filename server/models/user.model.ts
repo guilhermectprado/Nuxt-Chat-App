@@ -25,12 +25,6 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
-    groups: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Group",
-      },
-    ],
     isOnline: { type: Boolean, default: false },
     lastSeen: { type: Date, default: Date.now },
   },
