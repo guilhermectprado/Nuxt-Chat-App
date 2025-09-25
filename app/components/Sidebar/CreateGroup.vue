@@ -41,7 +41,12 @@
         </UFormField>
 
         <div class="w-full flex justify-between gap-4">
-          <UButton variant="ghost" label="Cancelar" color="neutral" />
+          <UButton
+            variant="ghost"
+            label="Cancelar"
+            color="neutral"
+            @click="emit('close', false)"
+          />
           <UButton variant="solid" label="Criar" type="submit" />
         </div>
       </UForm>
@@ -54,6 +59,9 @@ import type { IFriendshipListResponse } from "~/types/friendship.type";
 import type { FormError, FormErrorEvent, FormSubmitEvent } from "@nuxt/ui";
 import type { ToastProps } from "@nuxt/ui";
 const toast = useToast();
+
+const emit = defineEmits(["close"]);
+
 const showToast = (
   title: string,
   description: string,
@@ -174,14 +182,11 @@ async function onSubmit(event: FormSubmitEvent<typeof state>) {
 
     if (!response.success) throw response;
 
-    // showToast(
-    //   response.data.statusCode,
-    //   response.data.message,
-    //   "material-material-symbols-light:check",
-    //   "success"
-    // );
+    showToast(response.message, "", "lucide:check", "success");
 
     await refreshNuxtData("chats");
+
+    emit("close");
   } catch (error: any) {
     showToast(
       error.data.statusCode,

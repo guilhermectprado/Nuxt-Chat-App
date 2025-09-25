@@ -21,7 +21,6 @@ export const useUserStore = defineStore("user", {
 
     updateUser(user: IUser) {
       this.user = user;
-      console.log(this.user);
     },
 
     clearUser() {

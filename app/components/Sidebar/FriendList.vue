@@ -115,7 +115,9 @@ const openCreateGroup = async () => {
 
   const modal = overlay.create(SidebarCreateGroup);
 
-  modal.open();
+  modal.open({
+    onClose: () => modal.close(),
+  });
 };
 
 const createChat = async (friend: IUser) => {

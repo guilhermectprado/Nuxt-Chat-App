@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
   const userId = getIdUser(event);
   const body = await readBody(event);
   const { image, ...updatedData } = body;
-  console.log(body);
+
   try {
     if (!userId) {
       throw createError({
