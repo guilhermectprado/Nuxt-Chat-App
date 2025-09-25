@@ -1,5 +1,5 @@
 <template>
-  <UModal title="">
+  <UModal title="Informações do usuário">
     <template #body>
       <div class="space-y-6">
         <div v-if="!isEnableEdit" class="flex justify-between items-start">
