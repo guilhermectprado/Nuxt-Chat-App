@@ -16,7 +16,7 @@ export default defineEventHandler(async (event) => {
 
     return {
       success: true,
-      chats: chats,
+      data: chats,
       count: chats.length,
     };
   } catch (error: any) {

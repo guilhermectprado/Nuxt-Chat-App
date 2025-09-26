@@ -27,9 +27,13 @@ export default defineEventHandler(async (event) => {
 
     const io = getSocketIO();
 
-    if (io) {
-      io.to(`chat-${chatId}`).emit("update-chat", {
-        ...chat,
+    if (io && chat) {
+      chat.participants.forEach((participant) => {
+        console.log(participant._id.toString());
+
+        io.to(participant._id.toString()).emit("update-chat", {
+          ...chat,
+        });
       });
     }
 

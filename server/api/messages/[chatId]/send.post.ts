@@ -70,13 +70,17 @@ export default defineEventHandler(async (event) => {
     const chat = await chatRepository.findChatById(chatId);
 
     const io = getSocketIO();
-    if (io) {
-      io.to(`chat-${chatId}`).emit("new-message", {
-        ...createdMessage,
-      });
+    if (io && chat) {
+      chat.participants.forEach((participant) => {
+        console.log(participant._id.toString());
 
-      io.to(`chat-${chatId}`).emit("update-chat", {
-        ...chat,
+        io.to(participant._id.toString()).emit("new-message", {
+          ...createdMessage,
+        });
+
+        io.to(participant._id.toString()).emit("update-chat", {
+          ...chat,
+        });
       });
     }
 

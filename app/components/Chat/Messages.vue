@@ -130,7 +130,7 @@ watch(
 ///////////////////////////////
 
 const { socket } = useSocketComposable();
-
+const { markChatAsRead } = useChatComposable();
 onMounted(() => {
   if (socket) {
     socket.off("new-message");
@@ -138,6 +138,8 @@ onMounted(() => {
     socket.on("new-message", async (message) => {
       if (message.chatId === activeChat.value?._id) {
         messages.value = [...messages.value, message];
+
+        markChatAsRead(message.chatId);
 
         if (message.image) {
           await nextTick();

@@ -1,10 +1,6 @@
 import type { IChat } from "~/types/chat.type";
-import { useUserStore } from "~/store/useUserStore";
 
 export const useChatComposable = () => {
-  const userStore = useUserStore();
-  const { socket } = useSocketComposable();
-
   const activeChat = useState<IChat | null>("activeChat", () => null);
 
   const setActiveChat = (chat: any) => {
@@ -19,17 +15,6 @@ export const useChatComposable = () => {
     activeChat.value = null;
   };
 
-  const joinUserChats = async (userChats: string[]) => {
-    if (!socket) return;
-
-    userChats.forEach((chat) => {
-      socket.emit("join-chat", {
-        chatId: chat,
-        userId: userStore.getUserId,
-      });
-    });
-  };
-
   const markChatAsRead = async (chatId: string) => {
     try {
       await $fetch(`/api/chats/${chatId}/mark-read`, { method: "PATCH" });
@@ -38,27 +23,17 @@ export const useChatComposable = () => {
     }
   };
 
-  ////////////////////////////////////////////////
-
-  // const joinSpecificChat = (chatId: string) => {
+  // const logout = (chatId: string) => {
   //   if (socket) {
-  //     socket.emit("join-chat", {
-  //       chatId,
-  //       userId: userStore.getUserId,
-  //     });
-  //   }
-  // };
-
-  // const leaveChat = (chatId: string) => {
-  //   if (socket) {
-  //     socket.emit('leave-chat', { chatId })
+  //     socket.emit('disconnect', { chatId })
   //   }
   // }
 
   return {
     activeChat: readonly(activeChat),
     setActiveChat,
+    markChatAsRead,
     clearActiveChat,
-    joinUserChats,
+    // joinUserChats,
   };
 };

@@ -63,7 +63,12 @@
             size="xl"
           />
 
-          <UBadge v-if="chat.unreadCounts?.[currentUserId] || 0 > 0">
+          <UBadge
+            v-if="
+              chat._id !== activeChat?._id &&
+              (chat.unreadCounts?.[currentUserId] || 0) > 0
+            "
+          >
             {{ chat.unreadCounts?.[currentUserId] }}
           </UBadge>
         </li>
@@ -81,7 +86,7 @@ import type { TabsItem } from "@nuxt/ui";
 import { useUserStore } from "~/store/useUserStore";
 import type { IChat, IChatListResponse } from "~/types/chat.type";
 
-const { setActiveChat, activeChat, joinUserChats } = useChatComposable();
+const { setActiveChat, activeChat } = useChatComposable();
 
 const {
   data: fetchedData,
@@ -146,9 +151,7 @@ watch(
   () => fetchedData,
   (newValue) => {
     if (newValue.value) {
-      listChats.value = newValue.value.chats;
-      const chatIds = newValue.value.chats.map((chat) => chat._id);
-      joinUserChats(chatIds);
+      listChats.value = [...newValue.value.data];
     }
   },
   { immediate: true }
@@ -169,6 +172,8 @@ onMounted(() => {
       const chat = listChats.value.find((chat) => chat._id === updatedChat._id);
 
       if (!chat) return;
+
+      console.log(updatedChat);
 
       chat.lastMessageSender = updatedChat.lastMessageSender;
       chat.lastMessageText = updatedChat.lastMessageText;

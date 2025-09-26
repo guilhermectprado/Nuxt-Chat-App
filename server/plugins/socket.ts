@@ -276,32 +276,16 @@ export default async (nitroApp: NitroApp) => {
   });
 };
 
-interface IChatJoinData {
-  chatId: string;
-  userId: string;
-}
-
 function setupSocketHandlers(io: SocketIOServer) {
   io.on("connection", (socket) => {
     console.log(`✅ Socket conectado: ${socket.id}`);
 
-    // Entrar em um chat
-    socket.on("join-chat", ({ chatId, userId }: IChatJoinData) => {
-      socket.join(`chat-${chatId}`);
+    // Entrar no ChatApp
+    socket.on("join-user", (userId: string) => {
+      socket.join(userId);
       socket.data.userId = userId;
-      console.log(`👤 Usuário ${userId} entrou no room chat-${chatId}`);
 
-      // Notificar outros usuários no chat (opcional)
-      socket.to(`chat-${chatId}`).emit("user-joined", { userId, chatId });
-    });
-
-    // Sair de um chat
-    socket.on("leave-chat", ({ chatId, userId }: IChatJoinData) => {
-      socket.leave(`chat-${chatId}`);
-      console.log(`👤 Usuário ${userId} saiu do room chat-${chatId}`);
-
-      // Notificar outros usuários (opcional)
-      socket.to(`chat-${chatId}`).emit("user-left", { userId, chatId });
+      console.log(`👤 Usuário ${userId} entrou no sistema.`);
     });
 
     // Desconexão

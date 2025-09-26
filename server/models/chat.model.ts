@@ -28,7 +28,6 @@ const chatSchema = new mongoose.Schema(
     },
     name: {
       type: String,
-      required: true,
       trim: true,
     },
     description: {
@@ -42,7 +41,6 @@ const chatSchema = new mongoose.Schema(
     admin: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: true,
     },
     // isPublicGroup: {
     //   type: Boolean,

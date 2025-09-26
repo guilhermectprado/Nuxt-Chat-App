@@ -21,7 +21,7 @@ export interface IChat {
 
 export interface IChatListResponse {
   success: boolean;
-  chats: IChat[];
+  data: IChat[];
   count: number;
 }
 
