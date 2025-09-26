@@ -5,6 +5,7 @@ import { getIdUser } from "~~/server/utils/getIdUser";
 export default defineEventHandler(async (event) => {
   try {
     const userId = getIdUser(event);
+    console.log(userId);
 
     if (!userId) {
       throw createError({
@@ -17,6 +18,7 @@ export default defineEventHandler(async (event) => {
     const acceptedFriendships = friendships.filter(
       (f) => f.status === "accepted"
     );
+    console.log(friendships);
 
     const friendIds = acceptedFriendships.map((friendship) => {
       return friendship.userOne.toString() === userId
