@@ -1,5 +1,6 @@
 import { getSocketIO } from "~~/server/plugins/socket";
 import { friendshipRepository } from "~~/server/repositories/friendship.repository";
+import { userRepository } from "~~/server/repositories/user.repository";
 import { getIdUser } from "~~/server/utils/getIdUser";
 
 export default defineEventHandler(async (event) => {
@@ -29,6 +30,13 @@ export default defineEventHandler(async (event) => {
     }
 
     await friendshipRepository.createFriendship(fromUserId, toUserId);
+
+    const user = await userRepository.findById(fromUserId);
+
+    const io = getSocketIO();
+    if (io) {
+      io.to(toUserId.toString()).emit("new-invite", user);
+    }
 
     return {
       success: true,

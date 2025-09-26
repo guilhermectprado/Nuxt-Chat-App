@@ -42,7 +42,7 @@
 
               <div>
                 <UButton
-                  v-if="searchedUser.relation === 'reject'"
+                  v-if="searchedUser.relation === 'none'"
                   icon="lucide:plus"
                   size="sm"
                   variant="subtle"
@@ -201,7 +201,7 @@ const updateInvite = async (userId: string, status: string) => {
       userInvited.relation = "friends";
       await refreshNuxtData("friends");
     } else {
-      userInvited.relation = "reject";
+      userInvited.relation = "none";
     }
   } catch (error: any) {
     showToast(

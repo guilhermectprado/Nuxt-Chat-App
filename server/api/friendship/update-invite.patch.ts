@@ -1,4 +1,6 @@
+import { getSocketIO } from "~~/server/plugins/socket";
 import { friendshipRepository } from "~~/server/repositories/friendship.repository";
+import { userRepository } from "~~/server/repositories/user.repository";
 import { getIdUser } from "~~/server/utils/getIdUser";
 
 export default defineEventHandler(async (event) => {
@@ -34,10 +36,20 @@ export default defineEventHandler(async (event) => {
       await friendshipRepository.deleteFriendRequestStatus(userId, fromUserId);
     }
 
+    const newFriend = await userRepository.findById(fromUserId);
+
     const message =
       status === "accepted"
         ? "Solicitação de amizade aceita com sucesso!"
         : "Solicitação de amizade rejeitada.";
+
+    const io = getSocketIO();
+    if (io) {
+      io.to(fromUserId.toString()).emit(
+        "new-friend",
+        `${newFriend?.fullName} aceitou sua solicitação de amizade.`
+      );
+    }
 
     return {
       success: true,

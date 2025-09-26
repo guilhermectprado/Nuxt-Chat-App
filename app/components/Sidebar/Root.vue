@@ -3,7 +3,7 @@
     class="flex flex-col justify-between p-4 gap-4 border-e border-indigo-400"
   >
     <header>
-      <SidebarHeader :showComponent="showComponent" @toggle="toggleList" />
+      <SidebarHeaderRoot :showComponent="showComponent" @toggle="toggleList" />
     </header>
 
     <main class="flex-1">
