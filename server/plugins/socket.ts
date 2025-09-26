@@ -223,7 +223,10 @@ export default async (nitroApp: NitroApp) => {
           console.log("🔌 Anexando ao servidor HTTP do Nitro");
           io = new SocketIOServer(reqSocket.server, {
             cors: {
-              origin: [`http://localhost:3000 || ${config.MONGODB_URI}`],
+              origin:
+                process.env.NODE_ENV === "production"
+                  ? ["https://nuxt-chat-app.vercel.app"]
+                  : ["http://localhost:3000"],
               methods: ["GET", "POST"],
               credentials: true,
             },

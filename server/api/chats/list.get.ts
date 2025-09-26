@@ -4,7 +4,6 @@ import { getIdUser } from "~~/server/utils/getIdUser";
 export default defineEventHandler(async (event) => {
   try {
     const userId = getIdUser(event);
-    console.log(userId);
 
     if (!userId) {
       throw createError({
@@ -14,7 +13,6 @@ export default defineEventHandler(async (event) => {
     }
 
     const chats = await chatRepository.findUserChats(userId);
-    console.log(chats);
 
     return {
       success: true,

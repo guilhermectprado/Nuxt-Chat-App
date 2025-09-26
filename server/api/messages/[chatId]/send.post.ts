@@ -72,8 +72,6 @@ export default defineEventHandler(async (event) => {
     const io = getSocketIO();
     if (io && chat) {
       chat.participants.forEach((participant) => {
-        console.log(participant._id.toString());
-
         io.to(participant._id.toString()).emit("new-message", {
           ...createdMessage,
         });

@@ -16,8 +16,6 @@ const { socket } = useSocketComposable();
 const userStore = useUserStore();
 
 onMounted(() => {
-  console.log(userStore.getUserId);
-
   if (socket) {
     socket.emit("join-user", userStore.getUserId);
   }

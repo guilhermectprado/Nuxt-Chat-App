@@ -173,8 +173,6 @@ onMounted(() => {
 
       if (!chat) return;
 
-      console.log(updatedChat);
-
       chat.lastMessageSender = updatedChat.lastMessageSender;
       chat.lastMessageText = updatedChat.lastMessageText;
       chat.lastMessageTimestamp = updatedChat.lastMessageTimestamp;

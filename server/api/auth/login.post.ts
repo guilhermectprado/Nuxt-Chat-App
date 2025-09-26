@@ -8,7 +8,6 @@ export default defineEventHandler(async (event) => {
     const { email, password } = await readBody(event);
 
     const user = await userRepository.findByEmail(email, true);
-    console.log(user);
 
     if (!user) {
       throw createError({
@@ -45,7 +44,6 @@ export default defineEventHandler(async (event) => {
       user,
     };
   } catch (error: any) {
-    console.log(error);
     if (error.statusCode && error.statusCode !== 500) {
       throw error;
     }

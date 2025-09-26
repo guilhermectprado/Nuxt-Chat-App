@@ -6,7 +6,6 @@ export default defineEventHandler(async (event) => {
     const userId = getIdUser(event);
 
     const user = await userRepository.findById(userId);
-    console.log(user);
 
     if (!user) {
       throw createError({
