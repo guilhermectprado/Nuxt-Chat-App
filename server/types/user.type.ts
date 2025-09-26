@@ -6,7 +6,7 @@ export interface IUser {
   password: string;
   fullName: string;
   username: string;
-  profileImage?: string;
+  profileImage: string;
   isOnline: boolean;
   lastSeen: Date;
   createdAt: Date;

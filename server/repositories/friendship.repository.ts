@@ -54,8 +54,7 @@ export class FriendshipRepository {
 
   async updateFriendRequestStatus(
     currentUserId: string,
-    initiatorId: string,
-    status: "accepted" | "none"
+    initiatorId: string
   ): Promise<IFriendship | null> {
     const [userOne, userTwo] = [currentUserId, initiatorId].sort();
 
@@ -67,7 +66,7 @@ export class FriendshipRepository {
         status: "pending", // Só pode alterar se estiver pendente
       },
       {
-        status,
+        status: "accepted",
         updatedAt: new Date(),
       },
       {
@@ -77,6 +76,19 @@ export class FriendshipRepository {
     );
 
     return friendship as IFriendship | null;
+  }
+
+  async deleteFriendRequestStatus(currentUserId: string, initiatorId: string) {
+    const [userOne, userTwo] = [currentUserId, initiatorId].sort();
+
+    const friendship = await Friendship.findOneAndDelete({
+      userOne: new Types.ObjectId(userOne),
+      userTwo: new Types.ObjectId(userTwo),
+      initiator: new Types.ObjectId(initiatorId),
+      status: "pending",
+    });
+
+    return friendship || null;
   }
 
   async getPendingFriendRequests(userId: string): Promise<IFriendship[]> {

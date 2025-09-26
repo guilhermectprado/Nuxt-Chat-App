@@ -1,3 +1,4 @@
+import { getSocketIO } from "~~/server/plugins/socket";
 import { friendshipRepository } from "~~/server/repositories/friendship.repository";
 import { getIdUser } from "~~/server/utils/getIdUser";
 

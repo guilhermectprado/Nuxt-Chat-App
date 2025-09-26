@@ -6,9 +6,9 @@ export interface IUser {
   username: string;
   profileImage: string;
   isOnline: boolean;
-  lastSeen: Date;
-  createdAt: Date;
-  updatedAt: Date;
+  lastSeen: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface IUserStore {

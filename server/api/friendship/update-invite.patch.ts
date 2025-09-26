@@ -14,10 +14,10 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    if (!["accepted", "none"].includes(status)) {
+    if (!["accepted", "reject"].includes(status)) {
       throw createError({
         statusCode: 400,
-        statusMessage: "Status deve ser 'accepted' ou 'none'.",
+        statusMessage: "Status deve ser 'accepted' ou 'reject'.",
       });
     }
 
@@ -28,19 +28,10 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    const updatedFriendship =
-      await friendshipRepository.updateFriendRequestStatus(
-        userId,
-        fromUserId,
-        status
-      );
-
-    if (!updatedFriendship) {
-      throw createError({
-        statusCode: 404,
-        statusMessage:
-          "Solicitação de amizade não encontrada ou já foi respondida.",
-      });
+    if (status === "accepted") {
+      await friendshipRepository.updateFriendRequestStatus(userId, fromUserId);
+    } else {
+      await friendshipRepository.deleteFriendRequestStatus(userId, fromUserId);
     }
 
     const message =

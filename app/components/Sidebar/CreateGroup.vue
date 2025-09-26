@@ -104,7 +104,7 @@ watch(
   () => friends,
   (newStatus) => {
     if (newStatus.value) {
-      listFriendsToSelect.value = newStatus.value.friends.map((friend) => ({
+      listFriendsToSelect.value = newStatus.value.data.map((friend) => ({
         label: friend.fullName,
         value: friend._id,
         avatar: {

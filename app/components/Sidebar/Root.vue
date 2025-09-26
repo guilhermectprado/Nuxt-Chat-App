@@ -15,7 +15,12 @@
       />
     </main>
 
-    <footer class="flex justify-center">
+    <footer class="flex justify-center gap-4">
+      <div>
+        <UCheckbox label="Pedidos amizade" />
+        <UCheckbox label="Editar informação de grupo" />
+      </div>
+
       <UButton
         @click="logout"
         variant="subtle"

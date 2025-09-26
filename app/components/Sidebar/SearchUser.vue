@@ -42,7 +42,7 @@
 
               <div>
                 <UButton
-                  v-if="searchedUser.relation === 'none'"
+                  v-if="searchedUser.relation === 'reject'"
                   icon="lucide:plus"
                   size="sm"
                   variant="subtle"
@@ -62,19 +62,27 @@
                   class="space-x-2"
                 >
                   <UButton
-                    icon="lucide:check"
-                    size="sm"
-                    variant="subtle"
-                    @click="updateInvite(searchedUser._id, 'accepted')"
-                    :loading="loadingUpdatedInvite[searchedUser._id]"
-                  />
-                  <UButton
                     icon="lucide:x"
                     size="sm"
                     variant="subtle"
                     color="error"
-                    @click="updateInvite(searchedUser._id, 'none')"
-                    :loading="loadingUpdatedInvite[searchedUser._id]"
+                    @click="updateInvite(searchedUser._id, 'reject')"
+                    :loading="loadingUpdateInvites[searchedUser._id]?.reject"
+                    :disabled="
+                      loadingUpdateInvites[searchedUser._id]?.accept ||
+                      loadingUpdateInvites[searchedUser._id]?.reject
+                    "
+                  />
+                  <UButton
+                    icon="lucide:check"
+                    size="sm"
+                    variant="subtle"
+                    @click="updateInvite(searchedUser._id, 'accepted')"
+                    :loading="loadingUpdateInvites[searchedUser._id]?.accept"
+                    :disabled="
+                      loadingUpdateInvites[searchedUser._id]?.accept ||
+                      loadingUpdateInvites[searchedUser._id]?.reject
+                    "
                   />
                 </div>
               </div>
@@ -111,8 +119,11 @@ const searchInput = ref<string>("");
 const loading = ref<boolean>(false);
 const data = ref<any>(undefined);
 const error = ref<any>(undefined);
+
 const loadingInvite = ref<Record<string, boolean>>({});
-const loadingUpdatedInvite = ref<Record<string, boolean>>({});
+const loadingUpdateInvites = ref<
+  Record<string, { accept: boolean; reject: boolean }>
+>({});
 
 const searchUsers = async () => {
   try {
@@ -151,16 +162,26 @@ const sendInviteToFriend = async (userId: string) => {
 
     userInvited.relation = "pending_sent";
   } catch (error: any) {
-    let errorMessage = `${error.data.statusCode} - ${error.data.message}`;
-    console.error(errorMessage);
+    showToast(
+      error.data.statusCode,
+      error.data.message,
+      "material-material-symbols-light:error",
+      "error"
+    );
   } finally {
     loadingInvite.value[userId] = false;
   }
 };
 
 const updateInvite = async (userId: string, status: string) => {
+  const action = status === "accepted" ? "accept" : "reject";
+
   try {
-    loadingUpdatedInvite.value[userId] = true;
+    if (!loadingUpdateInvites.value[userId]) {
+      loadingUpdateInvites.value[userId] = { accept: false, reject: false };
+    }
+
+    loadingUpdateInvites.value[userId][action] = true;
 
     const response = await $fetch("/api/friendship/update-invite", {
       method: "PATCH",
@@ -180,7 +201,7 @@ const updateInvite = async (userId: string, status: string) => {
       userInvited.relation = "friends";
       await refreshNuxtData("friends");
     } else {
-      userInvited.relation = "none";
+      userInvited.relation = "reject";
     }
   } catch (error: any) {
     showToast(
@@ -190,7 +211,9 @@ const updateInvite = async (userId: string, status: string) => {
       "error"
     );
   } finally {
-    loadingUpdatedInvite.value[userId] = false;
+    if (loadingUpdateInvites.value[userId]) {
+      loadingUpdateInvites.value[userId][action] = false;
+    }
   }
 };
 

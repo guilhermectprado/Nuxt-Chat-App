@@ -95,7 +95,7 @@ const filterByName = (friends: IUser[], name: string) => {
 };
 
 const filteredFriends = computed(() => {
-  let friends = data.value?.friends || [];
+  let friends = data.value?.data || [];
 
   friends = filterByName(friends, search.value);
 

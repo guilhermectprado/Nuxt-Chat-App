@@ -14,11 +14,12 @@ export default defineEventHandler(async (event) => {
     }
 
     const friendships = await friendshipRepository.findUserFriendships(userId);
-    const acceptedFriendships = friendships.filter(
-      (f) => f.status === "accepted"
+
+    const pendingRequests = friendships.filter(
+      (f) => f.status === "pending" && f.initiator.toString() !== userId
     );
 
-    const friendIds = acceptedFriendships.map((friendship) => {
+    const friendIds = pendingRequests.map((friendship) => {
       return friendship.userOne.toString() === userId
         ? friendship.userTwo.toString()
         : friendship.userOne.toString();
