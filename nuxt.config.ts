@@ -20,6 +20,7 @@ export default defineNuxtConfig({
     CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME,
     JWT_SECRET: process.env.JWT_SECRET,
     MONGODB_URI: process.env.MONGODB_URI,
+    HOMOLOG_URL: process.env.HOMOLOG_URL,
     NODE_ENV: "development",
     public: {
       socketUrl: process.env.NUXT_PUBLIC_SOCKET_URL || "http://localhost:3000",

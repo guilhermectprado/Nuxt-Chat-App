@@ -201,6 +201,7 @@ import { IChat } from "./../types/chat.type";
 import { Server as SocketIOServer } from "socket.io";
 import { createServer } from "http";
 import type { NitroApp } from "nitropack";
+const config = useRuntimeConfig();
 
 let io: SocketIOServer | null = null;
 
@@ -222,7 +223,7 @@ export default async (nitroApp: NitroApp) => {
           console.log("🔌 Anexando ao servidor HTTP do Nitro");
           io = new SocketIOServer(reqSocket.server, {
             cors: {
-              origin: ["http://localhost:3000"],
+              origin: [`http://localhost:3000 || ${config.MONGODB_URI}`],
               methods: ["GET", "POST"],
               credentials: true,
             },
