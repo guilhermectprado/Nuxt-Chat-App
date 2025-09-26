@@ -224,7 +224,7 @@ export default async (nitroApp: NitroApp) => {
           io = new SocketIOServer(reqSocket.server, {
             cors: {
               origin:
-                process.env.NODE_ENV === "production"
+                config.NODE_ENV === "production"
                   ? ["https://nuxt-chat-app-tau.vercel.app/"]
                   : ["http://localhost:3000"],
               methods: ["GET", "POST"],
